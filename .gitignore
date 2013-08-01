@@ -1,0 +1,7 @@
+# do no keep pydev files under src control
+.pydev
+.pydevproject
+.project
+
+# do not keep experimental files under source control
+test
