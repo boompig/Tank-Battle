@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Represents a user, sharing same params as DB table 'user'
+ */
 class User  {
 
 	const OFFLINE = 1;
@@ -25,8 +28,12 @@ class User  {
 		$this->password = sha1($this->salt . $clearPassword);
 	}
 	
-	
-	// Initializes the password to a random value
+	/**
+	 * Create a random password with salt. Store salt and *hashed* password in object.
+	 * Return just the password, in the clear.
+	 * This is used if user forgot their password, to generate a new one.
+	 * @return {String}
+	 */
 	public function initPassword() {
 		$this->salt = mt_rand();
 		$clearPassword = mt_rand();
@@ -34,10 +41,13 @@ class User  {
 		return $clearPassword;	
 	}
 	
+	/**
+	 * Return true iff the given password corresponds to the stored password
+	 * @param {String} $clearPassword
+	 * @return {Boolean}
+	 */
 	public function comparePassword($clearPassword) {
-		if ($this->password == sha1($this->salt . $clearPassword))
-			return true;	
-		return false;
+		return $this->password === sha1($this->salt . $clearPassword);
 	}
 	
 	public function fullName() {
