@@ -5,6 +5,9 @@
  */
 class User  {
 
+	/**
+	 * These constants exactly correspond to the contents of user_status table.
+	 */
 	const OFFLINE = 1;
 	const AVAILABLE = 2;
 	const WAITING = 3;
