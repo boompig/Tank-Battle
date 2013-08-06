@@ -1,0 +1,18 @@
+/**
+ * 	Styling for battlefield view
+ */
+
+#chatContainer, canvas#arena {
+	display: inline-block;
+}
+
+#chatContainer textarea {
+	/*width: 100px;*/
+	resize: none;
+	background-color: #fff;
+	border: 1px solid #999;
+}
+
+canvas#arena {
+	border: 1px solid #999;
+}
