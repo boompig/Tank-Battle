@@ -66,10 +66,17 @@ class Account extends CI_Controller {
 		//Then we redirect to the index page again
 	}
 
+	/**
+	 * Open view to create new account.
+	 */
 	function newForm() {
 		$this -> load -> view('account/newForm');
 	}
-
+	
+	/**
+	 * This function handles creation of new accounts.
+	 * Data sent from newForm view.
+	 */
 	function createNew() {
 		$this -> load -> library('form_validation');
 		$this -> form_validation -> set_rules('username', 'Username', 'required|is_unique[user.login]');
