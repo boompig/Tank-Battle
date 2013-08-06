@@ -4,31 +4,36 @@
 <html>
 	
 	<head>
+		<title>Main Page | CSC309A3</title>
+		<meta charset="UTF-8" />
 
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
-	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
-	<script>
-		$(function(){
-			$('#availableUsers').everyTime(500,function(){
-					$('#availableUsers').load('<?= base_url() ?>arcade/getAvailableUsers');
-
-					$.getJSON('<?= base_url() ?>arcade/getInvitation',function(data, text, jqZHR){
-							if (data && data.invited) {
-								var user=data.login;
-								var time=data.time;
-								if(confirm('Battle ' + user)) 
-									$.getJSON('<?= base_url() ?>arcade/acceptInvitation',function(data, text, jqZHR){
-										if (data && data.status == 'success')
-											window.location.href = '<?= base_url() ?>combat/index'
-									});
-								else  
-									$.post("<?= base_url() ?>arcade/declineInvitation");
-							}
-						});
-				});
-			});
+		<!-- Google-hosted JQuery -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		
+		<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
+		<script>
+			$(function(){
+				
+				$('#availableUsers').everyTime(500, function(){
+						$('#availableUsers').load('<?= base_url() ?>arcade/getAvailableUsers');
 	
-	</script>
+						$.getJSON('<?= base_url() ?>arcade/getInvitation',function(data, text, jqZHR){
+								if (data && data.invited) {
+									var user=data.login;
+									var time=data.time;
+									if(confirm('Battle ' + user)) 
+										$.getJSON('<?= base_url() ?>arcade/acceptInvitation',function(data, text, jqZHR){
+											if (data && data.status == 'success')
+												window.location.href = '<?= base_url() ?>combat/index'
+										});
+									else  
+										$.post("<?= base_url() ?>arcade/declineInvitation");
+								}
+							});
+					});
+				});
+		
+		</script>
 	</head> 
 <body>  
 	<h1>Tank Battle</h1>
