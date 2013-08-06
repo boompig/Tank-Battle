@@ -1,0 +1,14 @@
+/**
+ * 	General style for all pages
+ */
+
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 1em;
+}
+
+header {
+	margin: 0 auto;
+	width: 50%;
+	text-align: center;
+}
