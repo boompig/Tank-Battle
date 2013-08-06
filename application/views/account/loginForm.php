@@ -2,11 +2,20 @@
 
 <html>
 	<head>
+		<title>Login | CSC309 Assignment 3</title>
+		<meta charset="UTF-8" />
+		
 		<style>
 			input {
 				display: block;
 			}
 		</style>
+		
+		<script>
+			// $(function() {
+				
+			// });
+		</script>
 
 	</head>
 	<body>
