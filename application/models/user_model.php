@@ -1,11 +1,17 @@
 <?php
 class User_model extends CI_Model {
 
+	/**
+	 * Return a User object if a user with the given username exists, null otherwise
+	 * @param {String} $username
+	 * @return {User}
+	 */
 	function get($username) {
 		$this -> db -> where('login', $username);
 		$query = $this -> db -> get('user');
 		if ($query && $query -> num_rows() > 0)
 			return $query -> row(0, 'User');
+		// instantiate this row with class User
 		else
 			return null;
 	}
@@ -52,6 +58,9 @@ class User_model extends CI_Model {
 		return $this -> db -> update('user', array('battle_id' => $battleId));
 	}
 
+	/**
+	 * Return either a CI result object for usernames of available users, or null if none exist.
+	 */
 	function getAvailableUsers() {
 		$this -> db -> where('user_status_id', User::AVAILABLE);
 		$query = $this -> db -> get('user');
@@ -69,6 +78,5 @@ class User_model extends CI_Model {
 		else
 			return null;
 	}
-
 }
 ?>
