@@ -60,6 +60,10 @@
 					console.log(game.encode());
 				});
 				
+				$("#submitButton").click(function() {
+					game.pushServer();
+				});
+				
 				// create bindings
 				$(document).keypress (function(e) {
 					var c = String.fromCharCode(e.which).toLowerCase();
@@ -143,6 +147,9 @@
         	<button type="button" id="playAgainButton">Play Again</button>
         </div>
         
-        <button type="button" id="encodeButton">Encode</button>
+        <footer>
+        	<button type="button" id="encodeButton">Encode</button>
+        	<button type="button" id="submitButton">Submit</button>
+        </footer>
     </body>
 </html>
