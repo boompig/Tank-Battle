@@ -175,11 +175,15 @@ Game.prototype.redraw = function () {
 	var normalShot;
 	
 	for (var i = 0; i < this.shots.length;) {
+		if (! this.shots[i]) {
+			console.log("fail");
+			console.log(this.shots);
+			continue;
+		}
+		
 		normalShot = true;
 		
 		if (this.isOnscreen(this.shots[i])) {
-			
-			
 			for (var p = 0; p < this.numPlayers; p++) {
 				if (this.tanks[p].isHit(this.shots[i]) && this.shots[i].src != p) {
 					this.shots[i].draw(this.context, true);
@@ -194,10 +198,6 @@ Game.prototype.redraw = function () {
 			}
 			
 			if (normalShot) {
-				if (! this.shots[i]) {
-					console.log(this.shots);
-				}
-				
 				this.shots[i].draw(this.context, false);
 				
 				// add velocity * speed
@@ -235,18 +235,35 @@ Game.prototype.getWinner = function () {
 };
 
 /**
+ * Return true iff the game is over.
+ * @returns {Boolean}
+ */
+Game.prototype.isGameOver = function () {
+	return this.tanks[0].isDead() || this.tanks[1].isDead();
+};
+
+/**
  * Return JSON for the current state of the game.
+ * @returns {Object}
  */
 Game.prototype.encode = function () {
 	var json = {
-		"me" : this.tanks[0].encode(),
-		"you" : this.tanks[1].encode(),
-		"shots" : []
+		"me" : this.tanks[0],
+		"you" : this.tanks[1],
+		"shots" : this.shots,
+		"over" : this.isGameOver()
 	};
 	
-	for (var i = 0; i < this.shots.length; i++) {
-		json["shots"].push(this.shots[i].encode());
-	}
-	
 	return json;
+};
+
+/**
+ * Push everything we know about the state of the game to the server
+ */
+Game.prototype.pushServer = function () {
+	var obj = this.encode();
+	var url = 
+	
+	
+	$.post();
 };
