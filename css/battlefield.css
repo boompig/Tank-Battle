@@ -1,18 +1,25 @@
-/**
- * 	Styling for battlefield view
- */
-
-#chatContainer, canvas#arena {
-	display: inline-block;
+header {
+	margin: 0 auto;
+	text-align: center;
 }
 
-#chatContainer textarea {
-	/*width: 100px;*/
-	resize: none;
-	background-color: #fff;
-	border: 1px solid #999;
+#content {
+	margin: 0 auto;
+	text-align: center;
 }
 
-canvas#arena {
-	border: 1px solid #999;
+#arena {
+	border: 1px solid #000;
+	margin: 0 auto;
+	
+	cursor: crosshair;
+}
+
+#results {
+	margin: 0 auto;
+	width: 500px;
+	font-size: 2.2em;
+	color: #1BE056;
+	font-weight: bold;
+	text-align: center;
 }

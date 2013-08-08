@@ -1,147 +1,148 @@
-
 <!DOCTYPE html>
 
 <html>
-	<head>
-		<title>Battlefield | Tank Battle</title>
-		<meta charset="UTF-8" />
-		
-		<!-- Google-hosted libraries -->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-		
-		<!-- local libraries -->
-		<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
-		
-		<!-- JQuery UI CSS -->
-		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/sunny/jquery-ui.css" />
-		
+    <head>
+        <title>Battle! | Tank Battle</title>
+        <meta charset="UTF-8" />
+
 		<!-- custom styling -->
-		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
 		<link rel="stylesheet" href="<?=base_url() ?>css/battlefield.css" />
-		
-		<!-- custom scripts -->
-		<script src="<?= base_url() ?>/js/vector.js"></script>
-		<script src="<?= base_url() ?>/js/tanks.js"></script>
-		
-		<script>
-			function clearCanvas () {
-				var canvas = $("#arena")[0];
-				canvas.width = canvas.width;
-			}
-			
-			function redrawCanvas (tank) {
-				clearCanvas();
-				tank.draw();
-			}
-		
-			var otherUser = "<?= $otherUser->login ?>";
-			var user = "<?= $user->login ?>";
-			var status = "<?= $status ?>";
-			
-			$(function(){
-				var tank = new Tank(new Vector(100, 100), "canvas#arena");
-				tank.draw();
+
+        <!-- local JQuery -->
+        <script src="<?=base_url() ?>js/lib/jquery-1.9.1.js"></script>
+
+        <!-- local scripts -->
+        <script src="<?=base_url() ?>js/battle/utils.js"></script>
+        <script src="<?=base_url() ?>js/battle/vector.js"></script>
+        <script src="<?=base_url() ?>js/battle/shot.js"></script>
+        <script src="<?=base_url() ?>js/battle/tanks.js"></script>
+        <script src="<?=base_url() ?>js/battle/game.js"></script>
+
+        <script>
+			$(function() {
+				"use strict";
 				
+				var target = null;
+				
+				// create the game
+				var game = new Game("#arena");
+				game.redraw();
+				
+				
+	        	function redraw () {
+	        		var result = game.redraw();
+	        		
+	        		if (target) {
+	        			game.shoot(0);
+	        		}
+	        		
+	        		if (result) {
+	        			// don't redraw on game over
+	        			setTimeout(redraw, 30);
+	        		} else {
+	        			var winner = game.getWinner() + 1;
+	        			$("#results").show().find("#winner").text("Player " + winner);
+	        		}
+	        	}
+				
+				// trigger a redraw every 1/5 second
+				setTimeout(redraw, 100);
+				
+				$("#playAgainButton").click(function() {
+					// delete(game)
+					game = new Game("#arena");
+					game.redraw();
+					
+					// TODO this does not work at all because we are breaking all the references to game
+				});
+				
+				$("#encodeButton").click(function() {
+					console.log(game.encode());
+				});
+				
+				// create bindings
 				$(document).keypress (function(e) {
 					var c = String.fromCharCode(e.which).toLowerCase();
 					
-					if (c === 'd') {
-						tank.move ("right");
-						redrawCanvas(tank);
-					} else if  (c === 's') {
-						tank.move("down");
-						redrawCanvas(tank);
-					} else if (c === "a") {
-						tank.move("left");
-						redrawCanvas(tank);
-					} else if (c === "w") {
-						tank.move("up");
-						redrawCanvas(tank);
+					// bindings for tank 0
+					if (c === 'w') {
+						// up
+						game.moveTankUp(0);
+					} else if (c === 'd') {
+						// right
+						game.moveTankRight(0);
+					} else if (c === 's') {
+						// down
+						game.moveTankDown(0);
+					} else if (c === 'a') {
+						// left
+						game.moveTankLeft(0);
+					} else if (c === ' ') {
+						game.shoot(1);
+					}
+					
+					// bindings for tank 1
+					if (c === 'j') {
+						game.moveTankLeft(1);
+					} else if (c === 'l') {
+						game.moveTankRight(1);
+					} else if (c === 'k') {
+						game.moveTankDown(1);
+					} else if (c === 'i') {
+						game.moveTankUp(1);
+					}
+					
+					if ($.inArray(e.keyCode, [37, 38, 39, 40])) {
+						e.preventDefault();
+					} 
+					
+					if (e.keyCode === 37) {
+						// left
+
+						game.rotateTurret(1, 1 / 10 * Math.PI);
+					} else if (e.keyCode === 38) {
+						// up
+						game.rotateTurret(1, 1 / 10 * Math.PI);
+					} else if (e.keyCode === 39) {
+						// right
+						game.rotateTurret(1, -1 / 10 * Math.PI);
+					}if (e.keyCode === 40) {
+						// down
+						game.rotateTurret(1, -1 / 10 * Math.PI);
 					}
 				});
 				
-				
-				// poll server for new messages every 2 seconds
-				$('body').everyTime(2000, function(){
-						if (status == 'waiting') {
-							$.getJSON('<?= base_url() ?>arcade/checkInvitation',function(data, text, jqZHR){
-									if (data && data.status=='rejected') {
-										alert("Sorry, your invitation to battle was declined!");
-										window.location.href = '<?= base_url() ?>arcade/index';
-									}
-									if (data && data.status=='accepted') {
-										status = 'battling';
-										$('#status').html('Battling ' + otherUser);
-									}
-									
-							});
-						}
-						var url = "<?= base_url() ?>combat/getMsg";
-						$.getJSON(url, function (data,text,jqXHR){
-							if (data && data.status=='success') {
-								var conversation = $('[name=conversation]').val();
-								var msg = data.message;
-								if (msg.length > 0)
-									$('[name=conversation]').val(conversation + "\n" + otherUser + ": " + msg);
-							}
-						});
+				$("#arena").mousemove (function (e) {
+					var coords = Utils.toCanvasCoords (e);
+					game.turnTurretTo(coords);
 				});
-	
-				// when send button is pressed
-				$('form').submit(function(){
-					var arguments = $(this).serialize();
-					var url = "<?= base_url() ?>combat/postMsg";
-					$.post(url,arguments, function (data, textStatus, jqXHR){
-						var conversation = $('[name=conversation]').val();
-						var msg = $('[name=msg]').val();
-						
-						// add most recent submission to conversation
-						$('[name=conversation]').val(conversation + "\n" + user + ": " + msg);
-						
-						// blank input field
-						$("[name=msg]").val("");
-					});
-					
-					// since everything submitted using AJAX, don't actually submit the form
-					return false;
-				});	
-			});
-		
-		</script>
-	</head> 
-	<body>  
-		<header>
-			<h1>Battle Field</h1>
-			
-			<div id="greeting">
-				Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
-			</div>
-		</header>
-		
-		<canvas id="arena" width="600" height="300">
-			
-		</canvas>	
-		
-		<div id="chatContainer">
-			<div id='status'>
-				<?php 
-					if ($status == "battling")
-						echo "Battling " . $otherUser->login;
-					else
-						echo "Wating on " . $otherUser->login;
-				?>
-			</div>
-			
-			<?php 
-				$attrs = array("name" => "conversation", "readonly" => "readonly");
-				echo form_textarea($attrs);
-				echo form_open();
-				echo form_input('msg');
-				echo form_submit('Send','Send');
-				echo form_close();
 				
-			?>
-		</div>
-	</body>
+				$("#arena").mousedown(function (e) {
+					target = Utils.toCanvasCoords (e);
+					game.shoot(0);
+				});
+				
+				$("#arena").mouseup(function (e) {
+					target = null;
+				});
+			});
+        </script>
+    </head>
+    <body>
+    	<header>
+    		<h1>Battle!</h1>
+    	</header>
+    	
+    	<div id="content">
+        	<canvas id="arena" height="300" width="500"></canvas>
+        </div>
+        
+        <div id="results" style="display: none;">
+        	<span>The winner is&nbsp;<span id="winner">Player 5</span></span>
+        	
+        	<button type="button" id="playAgainButton">Play Again</button>
+        </div>
+        
+        <button type="button" id="encodeButton">Encode</button>
+    </body>
 </html>

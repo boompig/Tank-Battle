@@ -11,6 +11,20 @@ function Vector(x, y) {
 }
 
 /**
+ * Return vector from coordinate system in r-theta
+ * @param {Number} r
+ * @param {Number} theta
+ * @returns {Vector}
+ */
+Vector.fromRadiusTheta = function (r, theta) {
+	"use strict";
+	
+	var x = r * Math.cos(theta);
+	var y = r * Math.sin(theta);
+	return new Vector (x, y);
+};
+
+/**
  * Return the squared magnitude of this vector.
  * @returns {Number}
  */
@@ -129,4 +143,27 @@ Vector.prototype.unitVector = function () {
     }
 
     return v.mul(1 / v.size());
+};
+
+/**
+ * Return the angle of this vector from standard position.
+ * Returns null if given 0 vector.
+ * @returns {Number}
+ */
+Vector.prototype.angle = function () {
+	if (this.x === 0 && this.y === 0) {
+		return null;
+	} else if (this.x === 0 && this.y < 0) {
+		return 3 * Math.PI / 2;
+	} else if (this.x === 0 && this.y > 0) {
+		return Math.PI / 2;
+	} else {
+		var angle = Math.atan (this.y / this.x);
+		
+		if (this.x < 0) {
+			angle += Math.PI;
+		}
+		
+		return angle;
+	}
 };
