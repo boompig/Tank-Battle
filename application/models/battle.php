@@ -1,4 +1,7 @@
 <?php
+/**
+ * Model for DB table Battle
+ */
 class Battle {
 	const ACTIVE = 1;
 	const U1WON = 2;

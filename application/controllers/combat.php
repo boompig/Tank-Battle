@@ -56,6 +56,44 @@ class Combat extends CI_Controller {
 	}
 
 	/**
+	 * Called by battleField.php to post the results of the battle.
+	 */
+	function postBattle () {
+		$this -> load -> library('form_validation');
+		$this -> form_validation -> set_rules("x1", "Tank x-coordinate", 'required');
+		$this -> form_validation -> set_rules("y1", "Tank y-coordinate", 'required');
+		
+		if ($this -> form_validation -> run()) {
+			
+			// makes sure this user is battling
+			$this -> load -> model('user_model');
+			$user = $_SESSION['user'];
+			$user = $this -> user_model -> getExclusive($user -> login);
+			if ($user -> user_status_id != User::BATTLING) {
+				$errMsg = "Not in BATTLING state";
+				goto error; //ewwwww using gotos in code is gross
+			}
+
+			$this -> load -> model('battle_model');
+			$x1 = $this -> input -> post('x1');
+			$y1 = $this -> input -> post('y1');
+
+			// TODO setting a bunch of variables for now
+			
+			$this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, 0, 0, 0, false, false);
+
+			echo json_encode(array('status' => 'success'));
+			
+			return;
+		}
+		
+		$errMsg = "Missing arg";
+		
+		error:
+			echo json_encode(array('status' => 'failure', 'message' => $errMsg));
+	}
+
+	/**
 	 * This method is called by views/battle/battleField.php to *send* messages between battling clients.
 	 * Need to specify message in POST request.
 	 *
