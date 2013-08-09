@@ -286,3 +286,19 @@ Tank.prototype.drawHP = function (context) {
 Tank.prototype.isDead = function () {
 	return this.hp === 0;
 };
+
+Tank.prototype.json = function () {
+	var o = {};
+	
+	for (prop in this) {
+		if (this.hasOwnProperty(prop)) {
+			if (prop === 'pos') {
+				o[prop] = {"x" : this.pos.x, "y" : this.pos.y};
+			} else {
+				o[prop] = this[prop];
+			}
+		}
+	}
+	
+	return o;
+};

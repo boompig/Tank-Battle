@@ -190,10 +190,13 @@ Game.prototype.redraw = function () {
 				
 					this.tanks[p].processHit();
 					this.shots.splice(i, 1);
+					normalShot = false;
 					
 					if (this.tanks[p].isDead()) {
 						over = true;
 					}
+					
+					break; // bullet can only hit 1 tank
 				}
 			}
 			
@@ -208,6 +211,7 @@ Game.prototype.redraw = function () {
 				i++;
 			}
 		} else {
+			// remove shot, since no longer on screen. Also, don't draw it
 			this.shots.splice(i, 1);
 		}
 	}
@@ -247,10 +251,17 @@ Game.prototype.isGameOver = function () {
  * @returns {Object}
  */
 Game.prototype.encode = function () {
+	// TODO for now make sure that we have the following here:
+	// x1, y1 of this tank
+	
+	"use strict";
+	
 	var json = {
-		"me" : this.tanks[0],
-		"you" : this.tanks[1],
-		"shots" : this.shots,
+		"x1" : this.tanks[0].pos.x,
+		"y1" : this.tanks[0].pos.y,
+		// "me" : this.tanks[0].json(),
+		// "you" : this.tanks[1].json(),
+		// "shots" : this.shots,
 		"over" : this.isGameOver()
 	};
 	
@@ -260,10 +271,16 @@ Game.prototype.encode = function () {
 /**
  * Push everything we know about the state of the game to the server
  */
-Game.prototype.pushServer = function () {
+Game.prototype.pushServer = function (serverURL) {
+	"use strict";
+	
 	var obj = this.encode();
-	var url = 
+	var url = serverURL + "combat/postBattle";
 	
-	
-	$.post();
+	$.post(url, obj, function (data, textStatus, jqXHR) {
+		console.log("data = " + data);
+		console.log("textStatus = " + textStatus);
+		console.log("jqXHR = " + jqXHR);
+		return false;
+	});
 };
