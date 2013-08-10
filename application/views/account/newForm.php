@@ -11,19 +11,20 @@ header('Expires: 0'); // Proxies.
 		<title>Create Account | CSC309 Assignment 3</title>
 		<meta charset="UTF-8" />
 
-		<style>
-			input {
-				display: block;
-			}
-		</style>
+		<!-- Google-hosted libaries -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 		
-		<!-- Google-hosted JQuery -->
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<!-- JQuery UI CSS -->
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/sunny/jquery-ui.css" />
+		
+		<!-- custom styling -->
+		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
+		<link rel="stylesheet" href="<?=base_url() ?>css/login.css" />
 		
 		<script>
 			$(function() {
-				//console.log('');
-				//console.log('');
+				$("input[type=submit], button").button();
 			});
 		
 			/**
