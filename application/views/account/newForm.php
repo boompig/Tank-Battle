@@ -1,3 +1,9 @@
+<?php
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+?>
+
 <!DOCTYPE html>
 
 <html>
@@ -66,7 +72,13 @@
 			echo form_label('Email');
 			echo form_error('email');
 			echo form_input('email', set_value('email'), "required");
-			
+		?>
+		
+		<img id="captcha" src="<?=base_url() ?>securimage/securimage_show.php" alt="CAPTCHA Image" />
+		<input type="text" name="captcha_code" size="10" maxlength="6" />
+		<a href="#" onclick="document.getElementById('captcha').src = '<?=base_url() ?>securimage/securimage_show.php?' + Math.random(); return false">[ Different Image ]</a>
+		
+		<?php
 			echo form_submit('submit', 'Register');
 			echo form_close();
 		?>
