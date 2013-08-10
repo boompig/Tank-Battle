@@ -50,3 +50,19 @@ Utils.toCanvasCoords = function(evt) {
 Utils.randomChoice = function (arr) {
         return arr[Math.randInt(0, arr.length - 1)];
 };
+
+/**
+ * Convert radians to degrees.
+ * @param {Number} rad Angle in radians.
+ */
+Utils.RadToDeg = function (rad) {
+	return rad / Math.PI * 180;
+};
+
+/**
+ * Convert degrees to radians.
+ * @param {Number} deg Angle in degrees.
+ */
+Utils.DegToRad = function (deg) {
+	return deg / 180 * Math.PI;
+};

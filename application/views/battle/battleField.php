@@ -29,29 +29,48 @@ header('Expires: 0'); // Proxies.
 				"use strict";
 				
 				var target = null;
+				var keys = [];
 				
 				// create the game
 				var game = new Game("#arena");
 				game.redraw();
 				
+				/**
+				 * Keep querying server until the game is over.
+				 */
+				function queryServer () {
+					var serverURL = "<?=base_url() ?>";
+					
+					game.pushServer(serverURL);
+					game.pullServer(serverURL);
+					
+					setTimeout(queryServer, 50);
+				}
 				
+				/**
+				 * Keep redrawing until the game is over.
+				 */
 	        	function redraw () {
 	        		var result = game.redraw();
 	        		
+	        		// for persistant mouse down
 	        		if (target) {
 	        			game.shoot(0);
 	        		}
 	        		
 	        		if (result) {
 	        			// don't redraw on game over
-	        			setTimeout(redraw, 30);
+	        			setTimeout(redraw, 50);
 	        		} else {
 	        			var winner = game.getWinner() + 1;
 	        			$("#results").show().find("#winner").text("Player " + winner);
 	        		}
 	        	}
 				
-				// trigger a redraw every 1/5 second
+				// do this before redraw to get initial info
+				queryServer();
+				
+				// trigger a redraw every so often
 				setTimeout(redraw, 100);
 				
 				$("#playAgainButton").click(function() {
@@ -68,6 +87,10 @@ header('Expires: 0'); // Proxies.
 				
 				$("#submitButton").click(function() {
 					game.pushServer("<?=base_url() ?>");
+				});
+				
+				$("#pullButton").click (function () {
+					game.pullServer("<?=base_url() ?>");
 				});
 				
 				// create bindings
@@ -156,6 +179,7 @@ header('Expires: 0'); // Proxies.
         <footer>
         	<button type="button" id="encodeButton">Encode</button>
         	<button type="button" id="submitButton">Submit</button>
+        	<button type="button" id="pullButton">Pull</button>
         </footer>
     </body>
 </html>

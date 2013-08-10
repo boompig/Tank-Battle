@@ -58,10 +58,26 @@ class Combat extends CI_Controller {
 	/**
 	 * Called by battleField.php to post the results of the battle.
 	 */
+	function postBattleStatus () {
+		$this -> load -> library('form_validation');
+		$this -> form_validation -> set_rules("status", "Game winner", 'required|matches[active|win|loss|draw]');
+		
+		
+	}
+
+	/**
+	 * Called by battleField.php to post the tank positions, turret angle, and other mid-game info.
+	 * Report only own status:
+	 * 		x		-	tank x (int)
+	 * 		y		-	tank y (int)
+	 * 		angle	-	turret angle (in degrees) (int)
+	 * 
+	 */
 	function postBattle () {
 		$this -> load -> library('form_validation');
-		$this -> form_validation -> set_rules("x1", "Tank x-coordinate", 'required');
-		$this -> form_validation -> set_rules("y1", "Tank y-coordinate", 'required');
+		$this -> form_validation -> set_rules("x", "Tank x-coordinate", 'required|integer');
+		$this -> form_validation -> set_rules("y", "Tank y-coordinate", 'required|integer');
+		$this -> form_validation -> set_rules("angle", "Tank y-coordinate", 'required|integer');
 		
 		if ($this -> form_validation -> run()) {
 			
@@ -77,10 +93,11 @@ class Combat extends CI_Controller {
 			$this -> load -> model('battle_model');
 			$x1 = $this -> input -> post('x1');
 			$y1 = $this -> input -> post('y1');
+			$angle = $this -> input -> post('angle');
 
 			// TODO setting a bunch of variables for now
 			
-			$this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, 0, 0, 0, false, false);
+			$this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, 0, 0, $angle, false, false);
 
 			echo json_encode(array('status' => 'success'));
 			
@@ -94,52 +111,9 @@ class Combat extends CI_Controller {
 	}
 
 	/**
-	 * This method is called by views/battle/battleField.php to *send* messages between battling clients.
-	 * Need to specify message in POST request.
-	 *
-	 * Return the result in JSON form
+	 * Return information about the game from the server.
 	 */
-	function postMsg() {
-		$this -> load -> library('form_validation');
-		$this -> form_validation -> set_rules('msg', 'Message', 'required');
-
-		if ($this -> form_validation -> run() == TRUE) {
-			$this -> load -> model('user_model');
-			$this -> load -> model('battle_model');
-
-			$user = $_SESSION['user'];
-
-			$user = $this -> user_model -> getExclusive($user -> login);
-			if ($user -> user_status_id != User::BATTLING) {
-				$errormsg = "Not in BATTLING state";
-				goto error; //ewwwww using gotos in code is gross
-			}
-
-			$battle = $this -> battle_model -> get($user -> battle_id);
-
-			$msg = $this -> input -> post('msg');
-
-			// here we're figuring out if this user is user_1 or user_2
-			if ($battle -> user1_id == $user -> id) {
-				$msg = $battle -> u1_msg == '' ? $msg : $battle -> u1_msg . "\n" . $msg;
-				$this -> battle_model -> updateMsgU1($battle -> id, $msg);
-			} else {
-				$msg = $battle -> u2_msg == '' ? $msg : $battle -> u2_msg . "\n" . $msg;
-				$this -> battle_model -> updateMsgU2($battle -> id, $msg);
-			}
-
-			echo json_encode(array('status' => 'success'));
-
-			return;
-		}
-
-		$errormsg = "Missing argument";
-
-		error:
-			echo json_encode(array('status' => 'failure', 'message' => $errormsg));
-	}
-
-	function getMsg() {
+	function getBattle () {
 		$this -> load -> model('user_model');
 		$this -> load -> model('battle_model');
 
@@ -154,13 +128,16 @@ class Combat extends CI_Controller {
 		$this -> db -> trans_begin();
 
 		$battle = $this -> battle_model -> getExclusive($user -> battle_id);
+		$data = array("status" => "success");
 
 		if ($battle -> user1_id == $user -> id) {
-			$msg = $battle -> u2_msg;
-			$this -> battle_model -> updateMsgU2($battle -> id, "");
+			$data['x'] = $battle -> u2_x1;
+			$data['y'] = $battle -> u2_x1;
+			$data['angle'] = $battle -> u2_angle;
 		} else {
-			$msg = $battle -> u1_msg;
-			$this -> battle_model -> updateMsgU1($battle -> id, "");
+			$data['x'] = $battle -> u1_x1;
+			$data['y'] = $battle -> u1_x1;
+			$data['angle'] = $battle -> u1_angle;
 		}
 
 		if ($this -> db -> trans_status() === FALSE) {
@@ -171,7 +148,7 @@ class Combat extends CI_Controller {
 		// if all went well commit changes
 		$this -> db -> trans_commit();
 
-		echo json_encode(array('status' => 'success', 'message' => $msg));
+		echo json_encode($data);
 		return;
 
 		transactionerror:
@@ -180,5 +157,4 @@ class Combat extends CI_Controller {
 		error:
 			echo json_encode(array('status' => 'failure', 'message' => $errormsg));
 	}
-
 }

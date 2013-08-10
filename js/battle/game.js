@@ -247,6 +247,26 @@ Game.prototype.isGameOver = function () {
 };
 
 /**
+ * Return a status string to denote game status
+ * Possible values:
+ * 		active	-	game ongoing
+ * 		win		-	this player won
+ * 		loss	-	other player won
+ * 		draw	-	both players lost simultaneously
+ */
+Game.prototype.getStatus = function () {
+	if (this.tanks[0].isDead() && this.tanks[1].isDead()) {
+		return 'draw';
+	} else if (this.tanks[0].isDead()) {
+		return 'loss';
+	} else if (this.tanks[1].isDead()) {
+		return 'win';
+	} else {
+		return 'active';
+	}
+};
+
+/**
  * Return JSON for the current state of the game.
  * @returns {Object}
  */
@@ -257,15 +277,33 @@ Game.prototype.encode = function () {
 	"use strict";
 	
 	var json = {
-		"x1" : this.tanks[0].pos.x,
-		"y1" : this.tanks[0].pos.y,
-		// "me" : this.tanks[0].json(),
-		// "you" : this.tanks[1].json(),
-		// "shots" : this.shots,
-		"over" : this.isGameOver()
+		"x" : this.tanks[0].pos.x,
+		"y" : this.tanks[0].pos.y,
+		"angle" : Math.round(Utils.RadToDeg(this.tanks[0].turretAngle)), // has to be an integer
+		"status" : this.getStatus()
 	};
 	
 	return json;
+};
+
+/**
+ * Pull game info from the server.
+ */
+Game.prototype.pullServer = function (serverURL) {
+	"use strict";
+	
+	var url = serverURL + "combat/getBattle";
+	var that = this;
+	
+	$.getJSON (url, function (data, textStatus, jqXHR) {
+		"use strict";
+		
+		if (data && data.status === 'success') {
+			that.tanks[1].pos.x = Number(data.x);
+			that.tanks[1].pos.y = Number(data.y);
+			that.tanks[1].turretAngle = Utils.DegToRad (Number(data.angle));
+		}
+	});
 };
 
 /**
@@ -278,9 +316,6 @@ Game.prototype.pushServer = function (serverURL) {
 	var url = serverURL + "combat/postBattle";
 	
 	$.post(url, obj, function (data, textStatus, jqXHR) {
-		console.log("data = " + data);
-		console.log("textStatus = " + textStatus);
-		console.log("jqXHR = " + jqXHR);
 		return false;
 	});
 };
