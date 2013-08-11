@@ -111,10 +111,10 @@ class Account extends CI_Controller {
 	 */
 	function checkCaptcha ($captca) {
 		if ($this -> secImg -> check ($captcha)) {
+			return true;
+		} else {
 			$this -> form_validation -> set_message ("checkCaptcha", "Incorrect captca. Try again?");
 			return false;
-		} else {
-			return true;
 		}
 	}
 	

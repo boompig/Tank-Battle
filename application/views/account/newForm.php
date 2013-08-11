@@ -103,7 +103,7 @@ header('Expires: 0'); // Proxies.
 				
 				<img id="captcha" src="<?=base_url() ?>securimage/securimage_show.php" alt="CAPTCHA Image" />
 				<?=form_error("captcha") ?>
-				<input type="text" name="captcha_code" size="10" maxlength="6" />
+				<input type="text" name="captcha" size="10" maxlength="6" />
 				
 				<?php
 					$contents = '<span class="ui-icon ui-icon-refresh"></span>';
