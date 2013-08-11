@@ -29,14 +29,19 @@
 	}
 	
 	#menu a, #menu a:visited {
-		color: #1BA5E0;
+		color: #000;
+		font-weight: bold;
+	}
+	
+	li:first-child:not(#userNameMain) {
+		background #fff !important;
 	}
 </style>
 
 <div id="userName" class="dropdown">
 	<ul id="menu">
 		<li>
-			<a href="#"><?=$_SESSION['user']->login ?></a>
+			<a href="#" id="userNameMain"><?=$_SESSION['user']->login ?></a>
 			<ul>
 				<li><a href="#"><?=anchor("arcade/index", "Lobby") ?></a></li>
 				<li><a href="#"><?=anchor("account/updatePasswordForm", "Change Password") ?></a></li>
