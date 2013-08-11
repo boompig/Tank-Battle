@@ -1,0 +1,23 @@
+#content {
+	width: 900px;	
+}
+
+input {
+	display: block;
+}
+
+#logoPane {
+	width: 50% !important;
+}
+
+.otherPane {
+	width: 30% !important;
+}
+
+a > button {
+	margin-top: 30px;
+}
+
+.error {
+	margin-bottom: 10px;
+}

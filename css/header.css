@@ -1,0 +1,43 @@
+header {
+	text-align: left;
+	width: 950px;
+	border-bottom: 1px solid #aaa;
+	padding-bottom: 10px;
+	margin: 0 auto;
+}
+
+header #appNameLink {
+	display: inline;
+}
+
+header h1, header h2 {
+	display: inline;
+	color: #1B60E0;
+	font-size: 1.5em !important;
+	line-height: 0 !important;
+}
+
+header h1:hover, header h2:hover {
+	color: #25A138;
+}
+
+.small-logo {
+	width: 100px;
+	height: 100px;
+	margin-bottom: -40px;
+	margin-top: -20px;
+}
+
+#logoAndName {
+	display: inline-block;
+}
+
+#logoAndName a {
+	cursor: pointer;
+}
+
+#userName {
+	margin-left: 600px;
+	padding-top: 15px;
+	display: inline-block;
+}

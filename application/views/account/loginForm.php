@@ -54,7 +54,6 @@ $this->load->model("html_utils");
 					
 					<span>Login to Tank Battle. If you don't have an account, you can</span>
 					<?=anchor('account/newForm', 'create an account now'); ?>
-					<span>.</span>
 				</div>
 				
 				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
@@ -62,7 +61,6 @@ $this->load->model("html_utils");
 			
 			<div id="loginForm" class="otherPane">
 				<?php
-				
 					if (isset($errorMsg)) {
 						echo "<div class='error'>" . $errorMsg . "</div>";
 					}

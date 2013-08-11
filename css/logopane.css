@@ -1,0 +1,19 @@
+#logoPane, .otherPane {
+	display: inline;
+	float: left;
+	width: 40%;
+}
+
+#logoPane {
+	margin-right: 100px;
+}
+
+.logoMsg h1, .logoMsg h2, .logoMsg h3, .logoMsg h4 {
+	color: #73B0E6;
+}
+
+.logoMsg * {
+	padding: 0;
+	margin-right: 0;
+	margin-left: 0;
+}

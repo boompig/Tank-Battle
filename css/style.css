@@ -11,9 +11,10 @@ body {
 	margin: 20px auto 0 auto;
 }
 
-a, a:visited {
+a, a:visited, a:hover {
 	color: #1BA5E0;
 	text-decoration: none;
+	cursor: pointer;
 }
 
 .error {

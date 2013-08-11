@@ -21,10 +21,23 @@ header('Expires: 0'); // Proxies.
 		
 		<!-- custom styling -->
 		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
-		<link rel="stylesheet" href="<?=base_url() ?>css/header.css" />
 		<link rel="stylesheet" href="<?=base_url() ?>css/recover.css" />
 		
 		<script>
+			$(function() {
+				"use strict";
+				
+				$("input[type=submit], button").button();
+				
+				var err = "<?=isset($errorMsg) ? $errorMsg : '' ?>";
+				if (err) {
+					$("[name=oldPassword]").keypress(function() {
+						$(this)[0].setCustomValidity('');
+						$(".error").hide();
+					})[0].setCustomValidity(err);
+				}
+			});
+		
 			function checkPassword() {
 				var p1 = $("#pass1"); 
 				var p2 = $("#pass2");
@@ -41,25 +54,40 @@ header('Expires: 0'); // Proxies.
 		</script>
 	</head> 
 	<body>
+		<?php $this->load->view("general/header"); ?>
+		
 		<div id="content">
-			<?php 
-				if (isset($errorMsg)) {
-					echo "<p>" . $errorMsg . "</p>";
-				}
 			
-				echo form_open('account/updatePassword');
-				echo form_label('Current Password'); 
-				echo form_error('oldPassword');
-				echo form_password('oldPassword',set_value('oldPassword'),"required");
-				echo form_label('New Password'); 
-				echo form_error('newPassword');
-				echo form_password('newPassword','',"id='pass1' required");
-				echo form_label('Password Confirmation'); 
-				echo form_error('passconf');
-				echo form_password('passconf','',"id='pass2' required oninput='checkPassword();'");
-				echo form_submit('submit', 'Change Password');
-				echo form_close();
-			?>	
+			<!-- it's a huge pain to put this in another view, so will just copy-paste -->
+			<link rel="stylesheet" href="<?=base_url() ?>css/logopane.css" />
+			<div id="logoPane">
+				<div class="logoMsg">
+					<h3>Change Password</h3>
+				</div>
+				
+				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
+			</div> <!-- end logoPane -->
+			
+			<div class="otherPane">
+				<?php 
+					if (isset($errorMsg)) {
+						echo "<div class='error'>" . $errorMsg . "</div>";
+					}
+				
+					echo form_open('account/updatePassword');
+					echo form_label('Current Password'); 
+					echo form_error('oldPassword');
+					echo form_password('oldPassword',set_value('oldPassword'),"required");
+					echo form_label('New Password'); 
+					echo form_error('newPassword');
+					echo form_password('newPassword','',"id='pass1' required");
+					echo form_label('Password Confirmation'); 
+					echo form_error('passconf');
+					echo form_password('passconf','',"id='pass2' required oninput='checkPassword();'");
+					echo form_submit('submit', 'Change Password');
+					echo form_close();
+				?>	
+			</div>
 		</div>
 	</body>
 </html>

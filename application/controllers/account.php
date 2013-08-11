@@ -63,6 +63,9 @@ class Account extends CI_Controller {
 		}
 	}
 
+	/**
+	 * Logout mechanism
+	 */
 	function logout() {
 		$user = $_SESSION['user'];
 		$this -> load -> model('user_model');
@@ -110,10 +113,16 @@ class Account extends CI_Controller {
 		}
 	}
 
+	/**
+	 * Load the form to change the password.
+	 */
 	function updatePasswordForm() {
 		$this -> load -> view('account/updatePasswordForm');
 	}
 
+	/**
+	 * Called by view account/updatePasswordForm to change the password.
+	 */
 	function updatePassword() {
 		$this -> form_validation -> set_rules('oldPassword', 'Old Password', 'required');
 		$this -> form_validation -> set_rules('newPassword', 'New Password', 'required');
@@ -139,12 +148,15 @@ class Account extends CI_Controller {
 		}
 	}
 
+	/**
+	 * Load the form to reset the password.
+	 */
 	function recoverPasswordForm() {
 		$this -> load -> view('account/recoverPasswordForm');
 	}
 
 	/**
-	 * Called by recoverPasswordForm view.
+	 * Called by account/recoverPasswordForm view.
 	 * Used to send an email with a new temporary password.
 	 */
 	function recoverPassword() {
