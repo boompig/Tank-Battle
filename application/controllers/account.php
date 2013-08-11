@@ -1,8 +1,19 @@
 <?php
 
+//TODO change this path if you want secure image library to work
+include_once $_SERVER['DOCUMENT_ROOT'] . "/csc309a3/securimage/securimage.php";
+
 class Account extends CI_Controller {
 
+	/**
+	 * Origin of password reset email
+	 */
 	private $fromEmail = "noreply@tankbattle.slav";
+	
+	/**
+	 * Class for secure image library
+	 */
+	private $secImg;
 
 	function __construct() {
 		// Call the Controller constructor
@@ -10,9 +21,11 @@ class Account extends CI_Controller {
 		
 		session_start();
 		$this -> load -> library('form_validation');
-		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
+		$this -> form_validation->set_error_delimiters('<div class="error">', '</div>');
 		
 		date_default_timezone_set('UTC');
+		
+		$this -> secImg = new Securimage();
 	}
 
 	public function _remap($method, $params = array()) {
@@ -58,6 +71,17 @@ class Account extends CI_Controller {
 				//redirect to the main application page
 			} else {
 				$data['errorMsg'] = 'Incorrect username or password!';
+				
+				if (isset($_SESSION['delay'])) {
+					// perform expo-delay
+					sleep($_SESSION['delay']);
+					// next time server will sleep for 2 seconds
+					$_SESSION['delay'] *= 2;
+				} else {
+					// next time server will sleep for 1 second
+					$_SESSION['delay'] = 1;
+				}
+				
 				$this -> load -> view('account/loginForm', $data);
 			}
 		}
@@ -83,6 +107,18 @@ class Account extends CI_Controller {
 	}
 	
 	/**
+	 * Used for validating the captcha.
+	 */
+	function checkCaptcha ($captca) {
+		if ($this -> secImg -> check ($captcha)) {
+			$this -> form_validation -> set_message ("checkCaptcha", "Incorrect captca. Try again?");
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/**
 	 * This function handles creation of new accounts.
 	 * Data sent from newForm view.
 	 */
@@ -92,6 +128,7 @@ class Account extends CI_Controller {
 		$this -> form_validation -> set_rules('first', 'First', "required");
 		$this -> form_validation -> set_rules('last', 'last', "required");
 		$this -> form_validation -> set_rules('email', 'Email', "required|is_unique[user.email]");
+		$this -> form_validation -> set_rules('captcha', 'Captcha', "required|callback_checkCaptcha");
 
 		if ($this -> form_validation -> run() == FALSE) {
 			$this -> load -> view('account/newForm');
