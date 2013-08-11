@@ -81,6 +81,9 @@ class Account extends CI_Controller {
 					// next time server will sleep for 1 second
 					$_SESSION['delay'] = 1;
 				}
+
+				//TODO for debugging
+				$data['delay'] = $_SESSION['delay'];
 				
 				$this -> load -> view('account/loginForm', $data);
 			}

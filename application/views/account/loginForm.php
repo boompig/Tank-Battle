@@ -29,11 +29,13 @@ $this->load->model("html_utils");
 			$(function() {
 				$("input[type=submit], button").button();
 				
+				$(".big-logo").tooltip();
+				
 				var errMsg = '<?= isset($errorMsg) ? $errorMsg : "" ?>';
 				
 				if (errMsg) {
-					$("[name=username]").keypress(function () {
-						$(this)[0].setCustomValidity('');
+					$("[name=username], [name=password]").keypress(function () {
+						$("[name=username], [name=password]")[0].setCustomValidity('');
 						$(".error").hide();
 					})[0].setCustomValidity(errMsg);
 				}
@@ -56,7 +58,8 @@ $this->load->model("html_utils");
 					<?=anchor('account/newForm', 'create an account now'); ?>
 				</div>
 				
-				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
+				<!-- inconspicuous way to show delay -->
+				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" title="Delay set to <?=isset($delay) ? $delay : 0 ?>" />
 			</div> <!-- end logoPane -->
 			
 			<div id="loginForm" class="otherPane">
