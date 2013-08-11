@@ -12,3 +12,8 @@ header, footer {
 	width: 50%;
 	text-align: center;
 }
+
+.error {
+	font-size: .9em;
+	color: red;
+}

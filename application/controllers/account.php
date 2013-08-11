@@ -5,7 +5,9 @@ class Account extends CI_Controller {
 	function __construct() {
 		// Call the Controller constructor
 		parent::__construct();
+		
 		session_start();
+		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
 	}
 
 	public function _remap($method, $params = array()) {
