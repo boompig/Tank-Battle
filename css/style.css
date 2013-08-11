@@ -7,13 +7,49 @@ body {
 	font-size: 1em;
 }
 
-header, footer {
-	margin: 0 auto;
-	width: 50%;
-	text-align: center;
+#content {
+	margin: 20px auto 0 auto;
 }
 
 .error {
 	font-size: .9em;
 	color: red;
+}
+
+/**
+ * 	Form labels should be small and bold
+ */
+label {
+	font-weight: bold;
+	font-size: .9em;
+}
+
+/**
+ * 	Format form fields to be easy on the eyes
+ */
+input[type=text], input[type=password] {
+	font-size: 1.1em;
+	padding: 4px;
+	border-radius: 5px;
+	border-style: solid;
+	border-color: #aaa;
+	
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+
+/**
+ * 	Make currently selected field have a gentle outline
+ */
+#registration input[type=text]:focus, #registration input[type=password]:focus {
+	border-color: #1BA5E0;
+}
+
+.big-logo {
+	height: 400px;
+	width: 400px;
+	margin-bottom: -100px;
+	margin-top: -50px;
+	z-index: -1;
+	pointer-events: none; /* so can click through image */
 }

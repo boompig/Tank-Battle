@@ -1,8 +1,33 @@
 #content {
-	margin: 0 auto;
-	width: 600px;	
+	/*margin: 0 auto;*/
+	width: 900px;	
 }
 
 input {
 	display: block;
+}
+
+#logoPane, #loginForm {
+	display: inline;
+	float: left;
+	width: 40%;
+}
+
+#logoPane {
+	margin-right: 100px;
+}
+
+a, a:visited {
+	color: #1BA5E0;
+	text-decoration: none;
+}
+
+#forgotPasswordLink {
+	font-size: .8em;
+	display: block;
+	margin-top: -5px;
+}
+
+input[type=submit] {
+	margin-top: 20px;
 }

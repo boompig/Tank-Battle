@@ -81,7 +81,7 @@ class Account extends CI_Controller {
 	 */
 	function createNew() {
 		$this -> load -> library('form_validation');
-		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
+		// $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
 		$this -> form_validation -> set_rules('username', 'Username', 'required|is_unique[user.login]');
 		$this -> form_validation -> set_rules('password', 'Password', 'required');
 		$this -> form_validation -> set_rules('first', 'First', "required");
