@@ -1,5 +1,5 @@
 input:not([name=captcha_code]), #captcha {
-	display: block;
+	/*display: block;*/
 	margin-top: 5px;
 	margin-bottom: 10px;
 }
