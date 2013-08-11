@@ -133,8 +133,9 @@ class Account extends CI_Controller {
 		if ($this -> form_validation -> run() == FALSE) {
 			$this -> load -> view('account/newForm');
 		} else {
+			
+			// create User object for this user
 			$user = new User();
-
 			$user -> login = $this -> input -> post('username');
 			$user -> first = $this -> input -> post('first');
 			$user -> last = $this -> input -> post('last');
@@ -142,11 +143,14 @@ class Account extends CI_Controller {
 			$user -> encryptPassword($clearPassword);
 			$user -> email = $this -> input -> post('email');
 
+			// insert the user into the DB
 			$this -> load -> model('user_model');
-
 			$this -> user_model -> insert($user);
-
-			$this -> load -> view('account/loginForm');
+			
+			// set the session variable, so they are immediately logged in
+			$_SESSION['user'] = $user;
+			
+			redirect('arcade/index', 'refresh');
 		}
 	}
 
