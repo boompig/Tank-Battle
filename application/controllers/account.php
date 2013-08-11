@@ -2,11 +2,17 @@
 
 class Account extends CI_Controller {
 
+	private $fromEmail = "noreply@tankbattle.slav";
+
 	function __construct() {
 		// Call the Controller constructor
 		parent::__construct();
 		
 		session_start();
+		$this -> load -> library('form_validation');
+		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
+		
+		date_default_timezone_set('UTC');
 	}
 
 	public function _remap($method, $params = array()) {
@@ -29,8 +35,6 @@ class Account extends CI_Controller {
 	 * Login mechanism
 	 */
 	function login() {
-		$this -> load -> library('form_validation');
-		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
 		$this -> form_validation -> set_rules('username', 'Username', 'required');
 		$this -> form_validation -> set_rules('password', 'Password', 'required');
 
@@ -80,8 +84,6 @@ class Account extends CI_Controller {
 	 * Data sent from newForm view.
 	 */
 	function createNew() {
-		$this -> load -> library('form_validation');
-		// $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
 		$this -> form_validation -> set_rules('username', 'Username', 'required|is_unique[user.login]');
 		$this -> form_validation -> set_rules('password', 'Password', 'required');
 		$this -> form_validation -> set_rules('first', 'First', "required");
@@ -113,7 +115,6 @@ class Account extends CI_Controller {
 	}
 
 	function updatePassword() {
-		$this -> load -> library('form_validation');
 		$this -> form_validation -> set_rules('oldPassword', 'Old Password', 'required');
 		$this -> form_validation -> set_rules('newPassword', 'New Password', 'required');
 
@@ -142,8 +143,11 @@ class Account extends CI_Controller {
 		$this -> load -> view('account/recoverPasswordForm');
 	}
 
+	/**
+	 * Called by recoverPasswordForm view.
+	 * Used to send an email with a new temporary password.
+	 */
 	function recoverPassword() {
-		$this -> load -> library('form_validation');
 		$this -> form_validation -> set_rules('email', 'email', 'required');
 
 		if ($this -> form_validation -> run() == FALSE) {
@@ -158,13 +162,13 @@ class Account extends CI_Controller {
 				$this -> user_model -> updatePassword($user);
 
 				$this -> load -> library('email');
-
+				
 				$config['protocol'] = 'smtp';
 				$config['smtp_host'] = 'ssl://smtp.gmail.com';
 				$config['smtp_port'] = '465';
 				$config['smtp_timeout'] = '7';
-				$config['smtp_user'] = 'google_username@gmail.com';
-				$config['smtp_pass'] = 'google_password';
+				$config['smtp_user'] = 'dbkats@gmail.com';
+				$config['smtp_pass'] = 'potatogreatgoodthink';
 				$config['charset'] = 'utf-8';
 				$config['newline'] = "\r\n";
 				$config['mailtype'] = 'text';
@@ -174,21 +178,17 @@ class Account extends CI_Controller {
 
 				$this -> email -> initialize($config);
 
-				$this -> email -> from('csc309Login@cs.toronto.edu', 'Login App');
-				$this -> email -> to($user -> email);
-
-				$this -> email -> subject('Password recovery');
-				$this -> email -> message("Your new password is $newPassword");
+				$this -> email -> from ($this->fromEmail);
+				$this -> email -> to ($email);
+				$this -> email -> subject ("Tank Battle - Password Recovery");
+				$this -> email -> message ("Your new password is $newPassword");
 
 				$result = $this -> email -> send();
 
-				//$data['errorMsg'] = $this->email->print_debugger();
-
-				//$this->load->view('emailPage',$data);
 				$this -> load -> view('account/emailPage');
 
 			} else {
-				$data['errorMsg'] = "No record exists for this email!";
+				$data['errorMsg'] = "No account with that email address exists!";
 				$this -> load -> view('account/recoverPasswordForm', $data);
 			}
 		}

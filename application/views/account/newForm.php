@@ -21,7 +21,6 @@ header('Expires: 0'); // Proxies.
 		
 		<!-- custom styling -->
 		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
-		<link rel="stylesheet" href="<?=base_url() ?>css/header.css" />
 		<link rel="stylesheet" href="<?=base_url() ?>css/register_user.css" />
 		
 		<script>
@@ -29,6 +28,8 @@ header('Expires: 0'); // Proxies.
 				"use strict";
 				
 				$("input[type=submit], button").button();
+				
+				$("#content").tooltip();
 				
 				$(".refresh-captcha").click(function () {
 					var src = '<?=base_url() ?>securimage/securimage_show.php?' + Math.random();
@@ -58,11 +59,19 @@ header('Expires: 0'); // Proxies.
 	<body>
 		<?php $this->load->view("general/header"); ?>
 		<div id="content">
+			
+			<!-- it's a huge pain to put this in another view, so will just copy-paste -->
+			<link rel="stylesheet" href="<?=base_url() ?>css/logopane.css" />
 			<div id="logoPane">
-				<div>Register for a Tank Battle account</div>
+				<div class="logoMsg">
+					<h3>Register</h3>
+					
+					<span>Register for a Tank Battle account by filling in all of the fields on the right.</span>
+				</div>
 				
 				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
-			</div>
+			</div> <!-- end logoPane -->
+
 			<div id="registration">
 				<?php
 					echo form_open('account/createNew');

@@ -11,6 +11,11 @@ body {
 	margin: 20px auto 0 auto;
 }
 
+a, a:visited {
+	color: #1BA5E0;
+	text-decoration: none;
+}
+
 .error {
 	font-size: .9em;
 	color: red;
@@ -41,7 +46,7 @@ input[type=text], input[type=password] {
 /**
  * 	Make currently selected field have a gentle outline
  */
-#registration input[type=text]:focus, #registration input[type=password]:focus {
+input[type=text]:focus, input[type=password]:focus {
 	border-color: #1BA5E0;
 }
 

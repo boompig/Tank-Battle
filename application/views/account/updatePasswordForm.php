@@ -1,14 +1,29 @@
+<?php
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+?>
 
 <!DOCTYPE html>
 
 <html>
 	<head>
-		<style>
-			input {
-				display: block;
-			}
-		</style>
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<title>Update Password | Tank Battle</title>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/gif" href="<?=base_url() ?>images/tank_transparent.GIF" />
+		
+		<!-- Google-hosted libaries -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+		
+		<!-- JQuery UI CSS -->
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/south-street/jquery-ui.css" />
+		
+		<!-- custom styling -->
+		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
+		<link rel="stylesheet" href="<?=base_url() ?>css/header.css" />
+		<link rel="stylesheet" href="<?=base_url() ?>css/recover.css" />
+		
 		<script>
 			function checkPassword() {
 				var p1 = $("#pass1"); 
@@ -25,27 +40,27 @@
 			}
 		</script>
 	</head> 
-<body>  
-	<h1>Change Password</h1>
-<?php 
-	if (isset($errorMsg)) {
-		echo "<p>" . $errorMsg . "</p>";
-	}
-
-	echo form_open('account/updatePassword');
-	echo form_label('Current Password'); 
-	echo form_error('oldPassword');
-	echo form_password('oldPassword',set_value('oldPassword'),"required");
-	echo form_label('New Password'); 
-	echo form_error('newPassword');
-	echo form_password('newPassword','',"id='pass1' required");
-	echo form_label('Password Confirmation'); 
-	echo form_error('passconf');
-	echo form_password('passconf','',"id='pass2' required oninput='checkPassword();'");
-	echo form_submit('submit', 'Change Password');
-	echo form_close();
-?>	
-</body>
-
+	<body>
+		<div id="content">
+			<?php 
+				if (isset($errorMsg)) {
+					echo "<p>" . $errorMsg . "</p>";
+				}
+			
+				echo form_open('account/updatePassword');
+				echo form_label('Current Password'); 
+				echo form_error('oldPassword');
+				echo form_password('oldPassword',set_value('oldPassword'),"required");
+				echo form_label('New Password'); 
+				echo form_error('newPassword');
+				echo form_password('newPassword','',"id='pass1' required");
+				echo form_label('Password Confirmation'); 
+				echo form_error('passconf');
+				echo form_password('passconf','',"id='pass2' required oninput='checkPassword();'");
+				echo form_submit('submit', 'Change Password');
+				echo form_close();
+			?>	
+		</div>
+	</body>
 </html>
 

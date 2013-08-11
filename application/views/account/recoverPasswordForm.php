@@ -1,3 +1,8 @@
+<?php
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+?>
 
 <!DOCTYPE html>
 
@@ -16,7 +21,6 @@
 		
 		<!-- custom styling -->
 		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
-		<link rel="stylesheet" href="<?=base_url() ?>css/header.css" />
 		<link rel="stylesheet" href="<?=base_url() ?>css/recover.css" />
 		
 		<script>
@@ -29,21 +33,41 @@
 		<?php $this->load->view("general/header"); ?>
 		
 		<div id="content">
-			<p></p>
-			<?php 
-				if (isset($errorMsg)) {
-					echo "<p>" . $errorMsg . "</p>";
-				}
 			
-				echo form_open('account/recoverPassword');
-				echo form_label('Email'); 
-				echo form_error('email');
-				echo form_input('email',set_value('email'),"required");
-				echo form_submit('submit', 'Recover Password');
-				echo form_close();
-			?>
-		</div>
+			<!-- it's a huge pain to put this in another view, so will just copy-paste -->
+			<link rel="stylesheet" href="<?=base_url() ?>css/logopane.css" />
+			<div id="logoPane">
+				<div class="logoMsg">
+					<h3>Forgot your password?</h3>
+					<span>Enter your email address to reset your password. You may need to check your spam folder or unblock noreply@tankbattle.slav</span>
+				</div>
+				
+				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
+			</div> <!-- end logoPane -->
+			
+			<div class='otherPane'>
+				<?php 
+					if (isset($errorMsg)) {
+						echo "<div class='error'>" . $errorMsg . "</div>";
+					}
+				
+					echo form_open('account/recoverPassword');
+					echo form_label('Email'); 
+					echo form_error('email');
+					
+					$arr = array(
+						"name" => "email",
+						"value" => set_value ("email"),
+						"required" => "required",
+						"size" => "22"
+					);
+					
+					echo form_input($arr);
+					echo form_submit('submit', 'Recover Password');
+					echo form_close();
+				?>
+			</div> <!-- end otherPane -->
+		</div> <!-- end content -->
 	</body>
-
 </html>
 

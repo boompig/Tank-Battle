@@ -1,4 +1,8 @@
 <?php
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+
 $this->load->model("html_utils");
 ?>
 
@@ -19,12 +23,20 @@ $this->load->model("html_utils");
 		
 		<!-- custom styling -->
 		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
-		<link rel="stylesheet" href="<?=base_url() ?>css/header.css" />
 		<link rel="stylesheet" href="<?=base_url() ?>css/login.css" />
 				
 		<script>
 			$(function() {
 				$("input[type=submit], button").button();
+				
+				var errMsg = '<?= isset($errorMsg) ? $errorMsg : "" ?>';
+				
+				if (errMsg) {
+					$("[name=username]").keypress(function () {
+						$(this)[0].setCustomValidity('');
+						$(".error").hide();
+					})[0].setCustomValidity(errMsg);
+				}
 			});
 		</script>
 
@@ -33,24 +45,28 @@ $this->load->model("html_utils");
 		<?php $this->load->view("general/header"); ?>
 		
 		<div id="content">
+			
+			<!-- it's a huge pain to put this in another view, so will just copy-paste -->
+			<link rel="stylesheet" href="<?=base_url() ?>css/logopane.css" />
 			<div id="logoPane">
-				<div>
+				<div class="logoMsg">
+					<h3>Sign In</h3>
+					
 					<span>Login to Tank Battle. If you don't have an account, you can</span>
-					 <?php
-					 	echo anchor('account/newForm', 'create an account now');
-					 ?>
-					 <span>.</span>
+					<?=anchor('account/newForm', 'create an account now'); ?>
+					<span>.</span>
 				</div>
 				
 				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
-			</div>
+			</div> <!-- end logoPane -->
 			
-			<div id="loginForm">
+			<div id="loginForm" class="otherPane">
 				<?php
+				
 					if (isset($errorMsg)) {
-						echo "<p>" . $errorMsg . "</p>";
+						echo "<div class='error'>" . $errorMsg . "</div>";
 					}
-		
+				
 					echo form_open('account/login');
 					echo form_label('Username');
 					echo form_error('username');
