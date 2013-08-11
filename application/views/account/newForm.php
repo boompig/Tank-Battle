@@ -67,6 +67,8 @@ header('Expires: 0'); // Proxies.
 					<h3>Register</h3>
 					
 					<span>Register for a Tank Battle account by filling in all of the fields on the right.</span>
+					
+					<?=validation_errors() ?>
 				</div>
 				
 				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
