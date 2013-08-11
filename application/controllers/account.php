@@ -109,7 +109,7 @@ class Account extends CI_Controller {
 	/**
 	 * Used for validating the captcha.
 	 */
-	function checkCaptcha ($captca) {
+	function checkCaptcha ($captcha) {
 		if ($this -> secImg -> check ($captcha)) {
 			return true;
 		} else {
