@@ -1,0 +1,84 @@
+input:not([name=captcha_code]), #captcha {
+	display: block;
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+
+img {
+	padding: 0;
+	margin: 0;
+}
+
+header {
+	text-align: left;
+	width: 950px;
+	border-bottom: 1px solid #aaa;
+	padding-bottom: 10px;
+}
+
+.small-logo {
+	width: 100px;
+	height: 100px;
+	margin-bottom: -40px;
+	margin-top: -20px;
+}
+
+header h1, header h2 {
+	display: inline;
+	color: #1B60E0;
+}
+
+#content {
+	margin: 20px auto 0 auto;
+	text-align: center;
+}
+
+#logoPane {
+	margin-left: 200px;
+}
+
+#logoPane, #registration {
+	float: left;
+	padding: 0;
+}
+
+#logoPane {
+	margin-right: 100px;
+}
+
+#registration {
+	text-align: left;
+}
+
+#registration label {
+	font-weight: bold;
+	font-size: .9em;
+}
+
+#registration input[type=text], #registration input[type=password] {
+	font-size: 1.1em;
+	padding: 4px;
+	border-radius: 5px;
+	border-style: solid;
+	border-color: #aaa;
+}
+
+#registration input[type=text]:focus, #registration input[type=password]:focus {
+	border-color: #1BA5E0;
+}
+
+.big-logo {
+	height: 400px;
+	width: 400px;
+	margin-bottom: -100px;
+	margin-top: -50px;
+}
+
+input[type=submit] {
+	display: block !important;
+	margin-top: 10px;
+}
+
+.ui-icon {
+	display: inline-block;
+}

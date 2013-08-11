@@ -8,23 +8,32 @@ header('Expires: 0'); // Proxies.
 
 <html>
 	<head>
-		<title>Create Account | CSC309 Assignment 3</title>
+		<title>Create Account | Tank Battle</title>
 		<meta charset="UTF-8" />
+		<link rel="icon" type="image/gif" href="<?=base_url() ?>images/tank_transparent.GIF" />
 
 		<!-- Google-hosted libaries -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 		
 		<!-- JQuery UI CSS -->
-		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/sunny/jquery-ui.css" />
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/south-street/jquery-ui.css" />
 		
 		<!-- custom styling -->
 		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
-		<link rel="stylesheet" href="<?=base_url() ?>css/login.css" />
+		<link rel="stylesheet" href="<?=base_url() ?>css/register_user.css" />
 		
 		<script>
 			$(function() {
+				"use strict";
+				
 				$("input[type=submit], button").button();
+				
+				$(".refresh-captcha").click(function () {
+					var src = '<?=base_url() ?>securimage/securimage_show.php?' + Math.random();
+					$("#captcha").attr("src", src);
+					return false;
+				});
 			});
 		
 			/**
@@ -46,43 +55,56 @@ header('Expires: 0'); // Proxies.
 		</script>
 	</head>
 	<body>
-		<h1>New Account</h1>
-		<?php
-			echo form_open('account/createNew');
-			
-			echo form_label('Username');
-			echo form_error('username');
-			echo form_input('username', set_value('username'), "required");
-			
-			echo form_label('Password');
-			echo form_error('password');
-			echo form_password('password', '', "id='pass1' required");
-			
-			echo form_label('Password Confirmation');
-			echo form_error('passconf');
-			echo form_password('passconf', '', "id='pass2' required oninput='checkPassword();'");
-			
-			echo form_label('First');
-			echo form_error('first');
-			echo form_input('first', set_value('first'), "required");
-			
-			echo form_label('Last');
-			echo form_error('last');
-			echo form_input('last', set_value('last'), "required");
-			
-			echo form_label('Email');
-			echo form_error('email');
-			echo form_input('email', set_value('email'), "required");
-		?>
-		
-		<img id="captcha" src="<?=base_url() ?>securimage/securimage_show.php" alt="CAPTCHA Image" />
-		<input type="text" name="captcha_code" size="10" maxlength="6" />
-		<a href="#" onclick="document.getElementById('captcha').src = '<?=base_url() ?>securimage/securimage_show.php?' + Math.random(); return false">[ Different Image ]</a>
-		
-		<?php
-			echo form_submit('submit', 'Register');
-			echo form_close();
-		?>
+		<?php $this->load->view("general/header"); ?>
+		<div id="content">
+			<div id="logoPane">
+				<div>Register for a Tank Battle account</div>
+				
+				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
+			</div>
+			<div id="registration">
+				<?php
+					echo form_open('account/createNew');
+					
+					echo form_label('Username');
+					echo form_error('username');
+					echo form_input('username', set_value('username'), "required");
+					
+					echo form_label('Password');
+					echo form_error('password');
+					echo form_password('password', '', "id='pass1' required");
+					
+					echo form_label('Confirm Password');
+					echo form_error('passconf');
+					echo form_password('passconf', '', "id='pass2' required oninput='checkPassword();'");
+					
+					echo form_label('First Name');
+					echo form_error('first');
+					echo form_input('first', set_value('first'), "required");
+					
+					echo form_label('Last Name');
+					echo form_error('last');
+					echo form_input('last', set_value('last'), "required");
+					
+					echo form_label('Email');
+					echo form_error('email');
+					echo form_input('email', set_value('email'), "required");
+				?>
+				
+				<img id="captcha" src="<?=base_url() ?>securimage/securimage_show.php" alt="CAPTCHA Image" />
+				<input type="text" name="captcha_code" size="10" maxlength="6" />
+				
+				<?php
+					$contents = '<span class="ui-icon ui-icon-refresh"></span>';
+					echo anchor("#", $contents, array("title" => "Different Captcha", "class" => "refresh-captcha"));
+				?>
+				
+				<?php
+					echo form_submit('submit', 'Register');
+					echo form_close();
+				?>
+			</div>
+		</div>
 	</body>
 
 </html>
