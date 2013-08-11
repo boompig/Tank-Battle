@@ -67,8 +67,6 @@ header('Expires: 0'); // Proxies.
 					<h3>Register</h3>
 					
 					<span>Register for a Tank Battle account by filling in all of the fields on the right.</span>
-					
-					<?=validation_errors() ?>
 				</div>
 				
 				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />
@@ -104,6 +102,7 @@ header('Expires: 0'); // Proxies.
 				?>
 				
 				<img id="captcha" src="<?=base_url() ?>securimage/securimage_show.php" alt="CAPTCHA Image" />
+				<?=form_error("captcha") ?>
 				<input type="text" name="captcha_code" size="10" maxlength="6" />
 				
 				<?php
