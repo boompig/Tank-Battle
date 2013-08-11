@@ -23,6 +23,14 @@
 	#menu a:hover {
 		background #fff !important;
 	}
+	
+	.ui-menu {
+		margin-left: 10px;
+	}
+	
+	#menu a, #menu a:visited {
+		color: #1BA5E0;
+	}
 </style>
 
 <div id="userName" class="dropdown">
