@@ -7,7 +7,6 @@ class Account extends CI_Controller {
 		parent::__construct();
 		
 		session_start();
-		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
 	}
 
 	public function _remap($method, $params = array()) {
@@ -31,6 +30,7 @@ class Account extends CI_Controller {
 	 */
 	function login() {
 		$this -> load -> library('form_validation');
+		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
 		$this -> form_validation -> set_rules('username', 'Username', 'required');
 		$this -> form_validation -> set_rules('password', 'Password', 'required');
 
