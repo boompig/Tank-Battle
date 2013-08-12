@@ -229,7 +229,7 @@ Tank.prototype.setTurretAngle = function (angle) {
  */
 Tank.prototype.setShot = function (x, y) {
 	// estimate angle by turret angle
-	this.shot = new Shot(new Vector(x, y), this.turretAngle(), this.index);
+	this.shot = new Shot(new Vector(x, y), this.turretAngle, this.index);
 	return this.shot;
 };
 

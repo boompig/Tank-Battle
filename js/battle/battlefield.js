@@ -69,7 +69,7 @@ Arena.serverPushPull = function () {
 			} else if (Arena.game.getStatus() === 'loss') {
 				msg = "You lost. Q_Q";
 			} else if (Arena.game.getStatus() === 'win') {
-				msg = "You won! Yay! \ o /";
+				msg = "You won! Yay! \\ o /";
 			}
 			
 			$("#results").show().find(".msg").html(msg);

@@ -36,7 +36,7 @@ header('Expires: 0'); // Proxies.
 			$(function() {
 				"use strict";
 				
-				$("button").button();
+				$("button, input[type=submit]").button();
 				
 				Arena.serverURL = "<?=base_url() ?>";
 				Arena.serverPushPull();
