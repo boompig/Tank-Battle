@@ -10,6 +10,9 @@ class Account extends CI_Controller {
 	 */
 	private $fromEmail = "noreply@tankbattle.slav";
 	
+	private $gmail = "tankbattleslav@gmail.com";
+	private $gmailPassword = "slavyslavslav";
+	
 	/**
 	 * Class for secure image library
 	 */
@@ -228,8 +231,8 @@ class Account extends CI_Controller {
 				$config['smtp_host'] = 'ssl://smtp.gmail.com';
 				$config['smtp_port'] = '465';
 				$config['smtp_timeout'] = '7';
-				$config['smtp_user'] = 'dbkats@gmail.com';
-				$config['smtp_pass'] = 'potatogreatgoodthink';
+				$config['smtp_user'] = $this -> gmail;
+				$config['smtp_pass'] = $this -> gmailPassword;
 				$config['charset'] = 'utf-8';
 				$config['newline'] = "\r\n";
 				$config['mailtype'] = 'text';
