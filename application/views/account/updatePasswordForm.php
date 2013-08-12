@@ -63,6 +63,15 @@ header('Expires: 0'); // Proxies.
 			<div id="logoPane">
 				<div class="logoMsg">
 					<h3>Change Password</h3>
+					
+					<span class="result">
+						<?php
+							if (isset($result)) {
+								echo $result;
+							}
+						?>
+					</span>
+					<span class="msg"><?=anchor("arcade/index", "Click here") ?> to go back to the lobby.</span>
 				</div>
 				
 				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />

@@ -21,3 +21,7 @@ a > button {
 .error {
 	margin-bottom: 10px;
 }
+
+.result {
+	color: #2C9421;
+}

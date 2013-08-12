@@ -192,7 +192,8 @@ class Account extends CI_Controller {
 				$this -> load -> model('user_model');
 				$this -> user_model -> updatePassword($user);
 				$data['user'] = $user;
-				$this -> load -> view('mainPage', $data);
+				$data['result'] = "You have successfully changed your password.";
+				$this -> load -> view ("account/updatePasswordForm", $data);
 			} else {
 				$data['errorMsg'] = "Incorrect password!";
 				$this -> load -> view('account/updatePasswordForm', $data);
