@@ -1,52 +1,47 @@
 <script>
 	$(function() {
-        $( "#menu" ).menu({ position: { my: "left top"} });
+        $("#userName a").tooltip();
 	});
 </script>
 
 <style>
 	/** too lazy to make another stylesheet. Fixes weird JQuery UI styling for menus */
 
-	#menu, .ui-menu-item, .ui-widget-content, .ui-menu {
-		background: #fff !important;
+	header .ui-icon {
+		opacity: .4;
+		height: 35px;
+		width: 35px;
 	}
 	
-	.ui-state-active {
-		background: #fff !important;
-		border: none !important;
+	header .ui-icon:hover {
+		opacity: 1;
 	}
 	
-	a.ui-state-focus {
-		border: none !important;
-	}
-	
-	#menu a:hover {
-		background #fff !important;
-	}
-	
-	.ui-menu {
-		margin-left: 10px;
-	}
-	
-	#menu a, #menu a:visited {
-		color: #000;
+	header #userName {
+		text-align: right;
+		display: inline;
+		margin-left: 530px;
+		font-size: 1.1em;
 		font-weight: bold;
 	}
 	
-	li:first-child:not(#userNameMain) {
-		background #fff !important;
+	#userNameMain {
+		position: relative;
+		bottom: 11px;
+	}
+	
+	header .ui-icon, #userNameMain {
+		display: inline;
+		margin-right: 10px;
 	}
 </style>
 
-<div id="userName" class="dropdown">
-	<ul id="menu">
-		<li>
-			<a href="#" id="userNameMain"><?=$_SESSION['user']->login ?></a>
-			<ul>
-				<li><a href="#"><?=anchor("arcade/index", "Lobby") ?></a></li>
-				<li><a href="#"><?=anchor("account/updatePasswordForm", "Change Password") ?></a></li>
-				<li><a href="#"><?=anchor("account/logout", "Logout") ?></a></li>
-			</ul>
-		</li>
-	</ul>
+<div id="userName">
+	<span id="userNameMain"><?=$_SESSION['user']->login ?></span>
+	<?php
+		$contents = '<img src="' . base_url() . 'images/settings.jpg" class="ui-icon ui-icon-settings"  />';
+		echo anchor("account/updatePasswordForm", $contents, array("title" => "Change Password"));
+		$contents = '<img src="' . base_url() . 'images/logout.png" class="ui-icon ui-icon-logout" title="Logout" />';
+		echo anchor("account/logout", $contents, array("title" => "Logout"));
+	?>
 </div>

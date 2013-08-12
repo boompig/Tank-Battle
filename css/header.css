@@ -13,8 +13,9 @@ header #appNameLink {
 header h1, header h2 {
 	display: inline;
 	color: #1B60E0;
-	font-size: 1.5em !important;
-	line-height: 0 !important;
+	
+	position: relative;
+	bottom: 6px;
 }
 
 header h1:hover, header h2:hover {
@@ -29,15 +30,5 @@ header h1:hover, header h2:hover {
 }
 
 #logoAndName {
-	display: inline-block;
-}
-
-#logoAndName a {
-	cursor: pointer;
-}
-
-#userName {
-	margin-left: 600px;
-	padding-top: 15px;
-	display: inline-block;
+	display: inline;
 }
