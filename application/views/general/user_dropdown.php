@@ -1,6 +1,6 @@
 <script>
 	$(function() {
-        $("#userName a").tooltip();
+        // $("#userName a").tooltip();
 	});
 </script>
 
@@ -20,7 +20,7 @@
 	header #userName {
 		text-align: right;
 		display: inline;
-		margin-left: 530px;
+		margin-left: 500px;
 		font-size: 1.1em;
 		font-weight: bold;
 	}
