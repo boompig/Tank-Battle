@@ -16,6 +16,9 @@ header('Expires: 0'); // Proxies.
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 
+		<!-- JQuery UI CSS -->
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/south-street/jquery-ui.css" />
+
 		<!-- custom styling -->
 		<link rel="stylesheet" href="<?=base_url() ?>css/style.css" />
 		<link rel="stylesheet" href="<?=base_url() ?>css/battlefield.css" />
@@ -31,10 +34,15 @@ header('Expires: 0'); // Proxies.
         <script>
         	function endBattle () {
         		window.location.href = "<?=base_url() ?>combat/leaveBattle";
+        		console.log("zoom");
         	}
         
 			$(function() {
 				"use strict";
+				
+				$("#backButton").click(function() {
+					endBattle();
+				})
 				
 				$("button, input[type=submit]").button();
 				
@@ -59,7 +67,7 @@ header('Expires: 0'); // Proxies.
 	        <div id="results" style="display: none;">
 	        	<span class="banner">Game Over.&nbsp;</span>
 	        	<span class="msg"><!-- results go here --></span>
-	        	<button type="button" onclick="endBattle">Return to Lobby</button>
+	        	<button type="button" id="backButton">Return to Lobby</button>
 	        </div>
      </div> <!-- end content -->
     </body>

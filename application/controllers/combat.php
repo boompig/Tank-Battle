@@ -156,7 +156,10 @@ class Combat extends CI_Controller {
 			if ($hasShot) {
 				$x2 = $this -> input -> post('shot_x');
 				$y2 = $this -> input -> post('shot_y');
-				$data['shot_x'] = $x2;
+				// $data['shot_x'] = $x2;
+			} else {
+				$x2 = null;
+				$y2 = null;
 			}
 						
 			// TODO still setting hit to false
