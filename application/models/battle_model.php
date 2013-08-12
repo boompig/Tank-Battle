@@ -51,9 +51,9 @@ class Battle_model extends CI_Model {
 		$battleObj = $this -> get($battleID);
 		
 		if ($battleObj -> user1_id === $userID) {
-			$this -> updateU1($battleID, $x1, $y1, $x2, $y2, $angle, $shot, $hit);
+			return $this -> updateU1($battleID, $x1, $y1, $x2, $y2, $angle, $shot, $hit);
 		} else {
-			$this -> updateU2($battleID, $x1, $y1, $x2, $y2, $angle, $shot, $hit);
+			return $this -> updateU2($battleID, $x1, $y1, $x2, $y2, $angle, $shot, $hit);
 		}
 	}
 

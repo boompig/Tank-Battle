@@ -131,7 +131,7 @@ Game.prototype.getPlayerFacing = function (playerIndex) {
 };
 
 Game.prototype.hasInitPos = function () {
-	return ! isNaN(this.tanks[0].x);
+	return this.tanks[0].pos && ! isNaN (this.tanks[0].pos.x);
 };
 
 /*******************************************************************************/
@@ -309,70 +309,4 @@ Game.prototype.updateOtherTank = function (x, y, angle) {
 	this.tanks[1].pos.x = Number(x);
 	this.tanks[1].pos.y = Number(y);
 	this.tanks[1].turretAngle = Utils.DegToRad (Number(angle));
-};
-
-/**
- * Pull game info from the server.
- * f is usually undefined, but can be a callback function to call on success
- */
-Game.prototype.pullServer = function (serverURL, first, f) {
-	"use strict";
-	
-	var url = serverURL + "combat/getBattle";
-	var that = this;
-	
-	if (this.tanks[0].x === null) {
-		first = true;
-	}
-	
-	$.getJSON (url, function (data, textStatus, jqXHR) {
-		"use strict";
-		
-		if (data && data.status === 'success') {
-			console.log(data);
-			
-			that.tanks[1].pos.x = Number(data.x);
-			that.tanks[1].pos.y = Number(data.y);
-			that.tanks[1].turretAngle = Utils.DegToRad (Number(data.angle));
-			
-			if (first) {
-				that.tanks[0].pos.x = Number(data.your_x);
-				that.tanks[0].pos.y = Number(data.your_y);
-				that.tanks[0].turretAngle = Utils.DegToRad (Number(data.your_angle));
-			}
-			
-			if (f) {
-				f ();
-			}
-		}
-	}).fail(function (data, textStatus) {
-		// console.log(url);
-		// someone else has the lock?
-		function f2 () {
-			console.log(serverURL);
-			console.log(first);
-			console.log(f);
-			that.pullServer(serverURL, first, f);
-		}
-		
-		// setTimeout(f2, 1000);
-		
-		// console.log("failed?");
-		// console.log(data);
-		// console.log(textStatus);
-	});
-};
-
-/**
- * Push everything we know about the state of the game to the server
- */
-Game.prototype.pushServer = function (serverURL) {
-	"use strict";
-	
-	var obj = this.encode();
-	var url = serverURL + "combat/postBattle";
-	
-	$.post(url, obj, function (data, textStatus, jqXHR) {
-		return false;
-	});
 };

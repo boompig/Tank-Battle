@@ -48,6 +48,7 @@ header('Expires: 0'); // Proxies.
 	    	</div>
 	    	
 	    	<canvas id="arena" height="400" width="600" style="display: none;"></canvas>
+	        <button type="button" onlick="Arena.stop">Stop</button>
 	        
 	        <div id="results" style="display: none;">
 	        	<span>The winner is&nbsp;<span id="winner">Player 5</span></span>

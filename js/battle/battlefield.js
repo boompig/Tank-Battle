@@ -18,6 +18,15 @@ Arena.STATES = {
 	"done" : 3
 };
 
+Arena.CONNECT_INTERVAL = 500;
+Arena.GAME_INTERVAL = 500;
+Arena.REFRESH_INTERVAL = 50;
+
+/**
+ * For mouse down purposes
+ */
+Arena.target = null;
+
 /**
  * Filled in from calling view
  */
@@ -73,7 +82,7 @@ Arena.checkInviteStatus = function () {
 		} else {
 			// no communication with server or incorrect response or pending status
 			Arena.drawDots ();
-			setTimeout(Arena.serverPushPull, 1000);
+			setTimeout(Arena.serverPushPull, Arena.CONNECT_INTERVAL);
 		}
 	});
 };
@@ -84,29 +93,65 @@ Arena.checkInviteStatus = function () {
 Arena.redraw = function () {
 	"use strict";
 	
+	if (Arena.target) {
+		Arena.game.shoot(0);
+	}
+	
 	Arena.game.redraw();
 	
 	if (! Arena.game.isGameOver() && Arena.state === Arena.STATES.playing) {
-		setTimeout(Arena.redraw, 50);
+		setTimeout(Arena.redraw, Arena.REFRESH_INTERVAL);
 	}
 };
 
-Arena.startGame = function () {
-	"use strict";
-	
-	Arena.game = new Game($("#arena"));
-	
-	var doGame = function () {
-		$("#arena").show();
-		console.log("redraw cycle started");
-		Arena.redraw();
+/**
+ * Attach keyboard and mouse events to the canvas.
+ */
+Arena.attachEvents = function () {
+	// create keyboard bindings
+	$(document).keypress (function(e) {
+		var c = String.fromCharCode(e.which).toLowerCase();
 		
-		// start push-pull cycle
-		setTimeout(Arena.updateGameServer, 500);
-	};
+		// prevent scrolling with arrow keys
+		if ($.inArray(e.keyCode, [37, 38, 39, 40])) {
+			e.preventDefault();
+		} 
+		
+		// bindings for tank 0
+		if (c === 'w' || e.keyCode === 38) {
+			// up
+			Arena.game.moveTankUp(0);
+		} else if (c === 'd' || e.keyCode === 39) {
+			// right
+			Arena.game.moveTankRight(0);
+		} else if (c === 's' || e.keyCode === 40) {
+			// down
+			Arena.game.moveTankDown(0);
+		} else if (c === 'a' || e.keyCode === 37) {
+			// left
+			Arena.game.moveTankLeft(0);
+		} else if (c === ' ') {
+			Arena.game.shoot(0);
+		}
+	});
 	
-	// get initial position of tanks. then show canvas
-	Arena.game.pullServer(Arena.serverURL, true, doGame);
+	$("#arena").mousemove (function (e) {
+		var coords = Utils.toCanvasCoords (e);
+		Arena.game.turnTurretTo(coords);
+	});
+	
+	$("#arena").mousedown(function (e) {
+		Arena.target = Utils.toCanvasCoords (e);
+		Arena.game.shoot(0);
+	});
+	
+	$("#arena").mouseup(function (e) {
+		Arena.target = null;
+	});
+};
+
+Arena.stop = function () {
+	Arena.state = Arena.STATES.done;
 };
 
 /**
@@ -117,67 +162,73 @@ Arena.startGame = function () {
 Arena.updateGameServer = function () {
 	var url;
 	
+	if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
+		// stop
+		return;
+	}
+	
+	if (Arena.pulling) {
+		setTimeout(Arena.serverPushPull, 50);
+		return;
+	}
+	
 	if (Arena.game.hasInitPos()) {
-		// have Arena.pulling to avoid conflict of push & pull
-		if (! Arena.game.isGameOver() && Arena.state === Arena.STATES.playing && !Arena.pulling) {
-			var obj = Arena.game.encode();
-			url = Arena.serverURL + "combat/postBattle";
-			
-			// this is the bush
-			$.post (url, obj, function (data, textStatus, jqXHR) {
-				// now can trigger pull
-				Arena.pulling = true;
-				url = Arena.serverURL + "combat/getBattle";
-				
-				$.getJSON (url, function (data, textStatus, jqXHR) {
-					if (data) {
-						Arena.game.updateOtherTank (data.x, data.y, data.angle);
-						
-						if (data.status !== 'active') {
-							Arena.state = Arena.STATES.done;
-						}
-					}
-					
-					Arena.pulling = false;
-				}).fail(function () {
-					Arena.pulling = false;
-				});
-				
-				return false;
-			});
-			
-			// update the server again in a bit
-			setTimeout(Arena.updateGameServer, 500);
-		}
-	} else {
-		if (! Arena.pulling) {
+		var obj = Arena.game.encode();
+		url = Arena.serverURL + "combat/postBattle";
+		
+		// this is the push
+		$.post (url, obj, function (data, textStatus, jqXHR) {
+			// now can trigger pull
 			Arena.pulling = true;
 			url = Arena.serverURL + "combat/getBattle";
-			console.log(url);
 			
-			// first pull
 			$.getJSON (url, function (data, textStatus, jqXHR) {
-				console.log("first pull data:");
-				console.log(data);
-				
 				if (data) {
 					Arena.game.updateOtherTank (data.x, data.y, data.angle);
-					Arena.game.updateOwnTank (data.your_x, data.your_y, data.your_angle);
 					
 					if (data.status !== 'active') {
 						Arena.state = Arena.STATES.done;
 					}
-					
-					$("#arena").show();
-					Arena.redraw();
 				}
 				
 				Arena.pulling = false;
 			}).fail(function () {
-				console.log("first pull failed");
 				Arena.pulling = false;
 			});
-		}
+			
+			return false;
+		});
+		
+		// update the server again in a bit
+		setTimeout(Arena.serverPushPull, Arena.GAME_INTERVAL);
+	} else {
+		Arena.pulling = true;
+		url = Arena.serverURL + "combat/getBattle";
+		
+		// first pull
+		$.getJSON (url, function (data, textStatus, jqXHR) {
+			console.log("first pull data:");
+			console.log(data);
+			
+			if (data) {
+				Arena.game.updateOtherTank (data.x, data.y, data.angle);
+				Arena.game.updateOwnTank (data.your_x, data.your_y, data.your_angle);
+				
+				if (data.status !== 'active') {
+					Arena.state = Arena.STATES.done;
+				}
+				
+				$("#arena").show();
+				Arena.attachEvents();
+				Arena.redraw();
+			}
+			
+			Arena.pulling = false;
+			setTimeout(Arena.serverPushPull, Arena.GAME_INTERVAL);
+		}).fail(function () {
+			console.log("first pull failed");
+			Arena.pulling = false;
+		});
 	}
 };
 
@@ -194,7 +245,7 @@ Arena.checkBattleStatus = function () {
 			
 			// TODO do some post-processing here
 		} else {
-			setTimeout(Arena.serverPushPull, 500);
+			setTimeout(Arena.serverPushPull, Arena.GAME_INTERVAL);
 		}
 	});
 };

@@ -111,6 +111,7 @@ class Combat extends CI_Controller {
 		$this -> form_validation -> set_rules("angle", "Tank y-coordinate", 'required|integer');
 		
 		if ($this -> form_validation -> run()) {
+			$data = array('status' => 'success');
 			
 			// makes sure this user is battling
 			$this -> load -> model('user_model');
@@ -122,15 +123,22 @@ class Combat extends CI_Controller {
 			}
 
 			$this -> load -> model('battle_model');
-			$x1 = $this -> input -> post('x1');
-			$y1 = $this -> input -> post('y1');
+			$x1 = $this -> input -> post('x');
+			$y1 = $this -> input -> post('y');
 			$angle = $this -> input -> post('angle');
+			
+			$data['x1']= $x1;
 
 			// TODO setting a bunch of variables for now
+			$data['user'] = $user;
 			
-			$this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, 0, 0, $angle, false, false);
+			$battleObj = $this -> battle_model -> get($user -> battle_id);
+			$data['battle'] = $battleObj;
+			
+			$result = $this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, 0, 0, $angle, false, false);
 
-			echo json_encode(array('status' => 'success'));
+			$data['result'] = $result;
+			echo json_encode($data);
 			
 			return;
 		}
