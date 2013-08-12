@@ -108,6 +108,7 @@ class Combat extends CI_Controller {
 		$this -> load -> library('form_validation');
 		$this -> form_validation -> set_rules("x", "Tank x-coordinate", 'required|integer');
 		$this -> form_validation -> set_rules("y", "Tank y-coordinate", 'required|integer');
+		$this -> form_validation -> set_rules("hasShot", "Whether tank has shot", 'required|is_natural|less_than[2]');
 		$this -> form_validation -> set_rules("angle", "Tank y-coordinate", 'required|integer');
 		
 		if ($this -> form_validation -> run()) {
@@ -125,17 +126,17 @@ class Combat extends CI_Controller {
 			$this -> load -> model('battle_model');
 			$x1 = $this -> input -> post('x');
 			$y1 = $this -> input -> post('y');
+			$hasShot = $this -> input -> post ('hasShot');
 			$angle = $this -> input -> post('angle');
 			
-			$data['x1']= $x1;
-
-			// TODO setting a bunch of variables for now
-			$data['user'] = $user;
-			
-			$battleObj = $this -> battle_model -> get($user -> battle_id);
-			$data['battle'] = $battleObj;
-			
-			$result = $this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, 0, 0, $angle, false, false);
+			if ($hasShot) {
+				$x2 = $this -> input -> post('shot_x');
+				$y2 = $this -> input -> post('shot_y');
+				$data['shot_x'] = $x2;
+			}
+						
+			// TODO still setting hit to false
+			$result = $this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, $x2, $y2, $angle, $hasShot, false);
 
 			$data['result'] = $result;
 			echo json_encode($data);
@@ -177,6 +178,9 @@ class Combat extends CI_Controller {
 			$data['x'] = $battle -> u2_x1;
 			$data['y'] = $battle -> u2_y1;
 			$data['angle'] = $battle -> u2_angle;
+			$data['shot_x'] = $battle -> u2_x2;
+			$data['shot_y'] = $battle -> u2_y2;
+			$data['hasShot'] = $battle -> u2_shot;
 			
 			// your player data
 			$data['your_x'] = $battle -> u1_x1;
@@ -189,6 +193,9 @@ class Combat extends CI_Controller {
 			$data['x'] = $battle -> u1_x1;
 			$data['y'] = $battle -> u1_y1;
 			$data['angle'] = $battle -> u1_angle;
+			$data['shot_x'] = $battle -> u1_x2;
+			$data['shot_y'] = $battle -> u1_y2;
+			$data['hasShot'] = $battle -> u1_shot;
 			
 			// your player data
 			$data['your_x'] = $battle -> u2_x1;

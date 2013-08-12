@@ -71,10 +71,33 @@ Game.prototype.rotateTurret = function (player, angle) {
 };
 
 /**
+ * Add a shot from the other tank
+ */
+Game.prototype.addOtherTankShot = function (shot_x, shot_y, hasShot) {
+	this.tanks[1].hasShot = hasShot;
+	
+	var added = false;
+	var shot = this.tanks[1].setShot(shot_x, shot_y);
+	
+	for (var i = 0; i < this.shots.length; i++) {
+		if (this.shots[i].src === 1) {
+			this.shots.splice(i, 1, shot);
+			added = true;
+		}
+	}
+	
+	if (! added) {
+		this.shots.push(shot);
+	}
+};
+
+/**
  * Shoot.
  */
 Game.prototype.shoot = function (player) {
 	"use strict";
+	
+	Game.SHOT_COUNT += 1;
 	
 	var shot = this.tanks[player].shoot();
 	
@@ -82,6 +105,8 @@ Game.prototype.shoot = function (player) {
 		this.shots.push(shot);
 	}
 };
+
+Game.SHOT_COUNT = 0;
 
 /*******************************************************************************/
 
@@ -130,6 +155,10 @@ Game.prototype.getPlayerFacing = function (playerIndex) {
 	}
 };
 
+/**
+ * Return true iff the initial position of the host player's tank has been set.
+ * @returns {Boolean}
+ */
 Game.prototype.hasInitPos = function () {
 	return this.tanks[0].pos && ! isNaN (this.tanks[0].pos.x);
 };
@@ -179,6 +208,11 @@ Game.prototype.redraw = function () {
 		this.tanks[i].draw(this.context);
 	}
 	
+	// draw hit points for the tank (done after for layering purposes)
+	for (var i = 0; i < this.numPlayers; i++) {
+		this.tanks[i].drawHP(this.context);
+	}
+	
 	var normalShot;
 	
 	for (var i = 0; i < this.shots.length;) {
@@ -196,7 +230,8 @@ Game.prototype.redraw = function () {
 					this.shots[i].draw(this.context, true);
 				
 					this.tanks[p].processHit();
-					this.shots.splice(i, 1);
+					var shot = this.shots.splice(i, 1);
+					this.tanks[shot[0].src].resetShot();
 					normalShot = false;
 					
 					if (this.tanks[p].isDead()) {
@@ -219,13 +254,11 @@ Game.prototype.redraw = function () {
 			}
 		} else {
 			// remove shot, since no longer on screen. Also, don't draw it
-			this.shots.splice(i, 1);
+			var shot = this.shots.splice(i, 1);
+			
+			if (shot)
+				this.tanks[shot[0].src].resetShot();
 		}
-	}
-	
-	// draw hit points for the tank (done after for layering purposes)
-	for (var i = 0; i < this.numPlayers; i++) {
-		this.tanks[i].drawHP(this.context);
 	}
 	
 	return ! over;
@@ -287,8 +320,22 @@ Game.prototype.encode = function () {
 		"x" : this.tanks[0].pos.x,
 		"y" : this.tanks[0].pos.y,
 		"angle" : Math.round(Utils.RadToDeg(this.tanks[0].turretAngle)), // has to be an integer
-		"status" : this.getStatus()
+		"status" : this.getStatus(),
+		"hasShot" : Number(this.tanks[0].hasShot), // encode to 0 or 1
+		"shot_x" : null,
+		"shot_y" : null,
+		"shotObjs" : []
 	};
+	
+	for (var i = 0; i < this.shots.length; i++) {
+		json["shotObjs"].push(this.shots[i].encode());
+		// console.log(this.shots[i].encode());
+		
+		if (this.shots[i].src === 0) {
+			json["shot_x"] = Math.round(this.shots[i].pos.x);
+			json["shot_y"] = Math.round(this.shots[i].pos.y);
+		}
+	}
 	
 	return json;
 };

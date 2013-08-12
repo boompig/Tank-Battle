@@ -26,11 +26,15 @@ function Tank (spawn, facing, index) {
 	this.index = index;
 	
 	/**
-	 * Time of last shot.
-	 * First shot set very far back in time
-	 * @returns {Date}
+	 * Whether this tank has shot a bullet (and the bullet is still in play)
+	 * @returns {Boolean}
 	 */
-	this.lastShot = new Date(1991, 10, 1);
+	this.hasShot = false;
+	
+	/**
+	 * The shot object for this tank.
+	 */
+	this.shot = null;
 	
 	/**
 	 * @returns {Number}
@@ -85,6 +89,14 @@ Tank.SHOT_FREQ = 300;
 /***********************************************/
 
 /**
+ * Signal to this tank that it can shoot again
+ */
+Tank.prototype.resetShot = function () {
+	this.shot = null;
+	this.hasShot = false;
+};
+
+/**
  * Return the shot object iff a shot is successful.
  * If a shot goes off, reset the shot clock.
  * Return false on failure.
@@ -92,13 +104,14 @@ Tank.SHOT_FREQ = 300;
 Tank.prototype.shoot = function () {
 	"use strict";
 	
-	if (new Date() - this.lastShot > Tank.SHOT_FREQ) {
-		this.lastShot = new Date();
+	if (! this.hasShot) {
+		this.hasShot = true;
 		
 		// get position of end of barrell
-		return new Shot(this.getShotInitPos(), this.turretAngle, this.index);
+		this.shot = new Shot(this.getShotInitPos(), this.turretAngle, this.index);
+		return this.shot;	
 	} else {
-		return false;
+		return null;
 	}
 };
 
@@ -208,6 +221,16 @@ Tank.prototype.setTurretAngle = function (angle) {
 	"use strict";
 	
 	this.turretAngle = angle;
+};
+
+/**
+ * Set the shot object.
+ * @returns {Shot} return newly created shot
+ */
+Tank.prototype.setShot = function (x, y) {
+	// estimate angle by turret angle
+	this.shot = new Shot(new Vector(x, y), this.turretAngle(), this.index);
+	return this.shot;
 };
 
 /**

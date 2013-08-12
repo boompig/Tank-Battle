@@ -19,7 +19,7 @@ Arena.STATES = {
 };
 
 Arena.CONNECT_INTERVAL = 500;
-Arena.GAME_INTERVAL = 500;
+Arena.GAME_INTERVAL = 400;
 Arena.REFRESH_INTERVAL = 50;
 
 /**
@@ -33,6 +33,8 @@ Arena.target = null;
 Arena.serverURL = null;
 
 Arena.pulling = false;
+
+Arena.pushing = false;
 
 /*
  * Number of dots to start with.
@@ -151,7 +153,92 @@ Arena.attachEvents = function () {
 };
 
 Arena.stop = function () {
+	"use strict";
+	
 	Arena.state = Arena.STATES.done;
+};
+
+Arena.pushGameServer = function () {
+	"use strict";
+	
+	if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
+		// stop
+		return;
+	}
+	
+	// do not push until we get initial data
+	if (! Arena.game.hasInitPos() || Arena.pushing) {
+		setTimeout(Arena.pushGameServer, 50);
+		return;
+	}
+	
+	var obj = Arena.game.encode();
+	var url = Arena.serverURL + "combat/postBattle";
+	
+	Arena.pushing = true;
+	
+	$.post (url, obj, function (data, textStatus, jqXHR) {
+		// now can trigger pull
+		Arena.pushing = false;
+		setTimeout (Arena.pushGameServer, Arena.GAME_INTERVAL);
+	}).fail (function () {
+		Arena.pushing = false;
+		setTimeout (Arena.pushGameServer, Arena.GAME_INTERVAL);
+	});
+};
+
+Arena.pullGameServer = function () {
+	"use strict"
+	
+	if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
+		// stop
+		return;
+	}
+	
+	if (Arena.pulling) {
+		setTimeout(Arena.pullGameServer, 50);
+		return;
+	}
+	
+	Arena.pulling = true;
+	var url = Arena.serverURL + "combat/getBattle";
+	var first = ! Arena.game.hasInitPos();
+	
+	$.getJSON (url, function (data, textStatus, jqXHR) {
+		if (data) {
+			Arena.game.updateOtherTank (data.x, data.y, data.angle);
+			
+			if (first) {
+				// console.log("first pull:");
+				// console.log(data);
+				
+				Arena.game.updateOwnTank (data.your_x, data.your_y, data.your_angle);
+				$("#arena").show();
+				Arena.attachEvents();
+				Arena.redraw();
+			} else {
+				// console.log("other shot: (" + data.shot_x + ", " + data.shot_y + ")");
+				// console.log(data.shot_x);
+				// console.log(data.shot_y);
+				// console.log("other shot : " + data.hasShot);
+				// console.log("x : " + data.shot_x);
+				// console.log("y : " + data.shot_y);
+				
+				// add shots
+				Arena.game.addOtherTankShot(Number(data.shot_x), Number(data.shot_y), Boolean(data.hasShot));
+			}
+			
+			if (data.status !== 'active') {
+				Arena.state = Arena.STATES.done;
+			}
+		}
+		
+		Arena.pulling = false;
+		setTimeout(Arena.pullGameServer, Arena.GAME_INTERVAL);
+	}).fail(function () {
+		Arena.pulling = false;
+		setTimeout(Arena.pullGameServer, Arena.GAME_INTERVAL);
+	});
 };
 
 /**
@@ -160,76 +247,9 @@ Arena.stop = function () {
  * Push (own info) before pull (other info)
  */
 Arena.updateGameServer = function () {
-	var url;
-	
-	if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
-		// stop
-		return;
-	}
-	
-	if (Arena.pulling) {
-		setTimeout(Arena.serverPushPull, 50);
-		return;
-	}
-	
-	if (Arena.game.hasInitPos()) {
-		var obj = Arena.game.encode();
-		url = Arena.serverURL + "combat/postBattle";
-		
-		// this is the push
-		$.post (url, obj, function (data, textStatus, jqXHR) {
-			// now can trigger pull
-			Arena.pulling = true;
-			url = Arena.serverURL + "combat/getBattle";
-			
-			$.getJSON (url, function (data, textStatus, jqXHR) {
-				if (data) {
-					Arena.game.updateOtherTank (data.x, data.y, data.angle);
-					
-					if (data.status !== 'active') {
-						Arena.state = Arena.STATES.done;
-					}
-				}
-				
-				Arena.pulling = false;
-			}).fail(function () {
-				Arena.pulling = false;
-			});
-			
-			return false;
-		});
-		
-		// update the server again in a bit
-		setTimeout(Arena.serverPushPull, Arena.GAME_INTERVAL);
-	} else {
-		Arena.pulling = true;
-		url = Arena.serverURL + "combat/getBattle";
-		
-		// first pull
-		$.getJSON (url, function (data, textStatus, jqXHR) {
-			console.log("first pull data:");
-			console.log(data);
-			
-			if (data) {
-				Arena.game.updateOtherTank (data.x, data.y, data.angle);
-				Arena.game.updateOwnTank (data.your_x, data.your_y, data.your_angle);
-				
-				if (data.status !== 'active') {
-					Arena.state = Arena.STATES.done;
-				}
-				
-				$("#arena").show();
-				Arena.attachEvents();
-				Arena.redraw();
-			}
-			
-			Arena.pulling = false;
-			setTimeout(Arena.serverPushPull, Arena.GAME_INTERVAL);
-		}).fail(function () {
-			console.log("first pull failed");
-			Arena.pulling = false;
-		});
-	}
+	// these are indep. and work on own timers
+	Arena.pushGameServer();
+	Arena.pullGameServer();
 };
 
 /**

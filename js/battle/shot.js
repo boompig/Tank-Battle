@@ -15,6 +15,7 @@ function Shot (initPos, angle, player) {
 	this.pos = initPos;
 	this.angle = angle;
 	this.src = player;
+	this.id = Game.SHOT_COUNT;
 }
 
 Shot.RADIUS = 2;
@@ -30,9 +31,13 @@ Shot.prototype.move = function (amt) {
 Shot.prototype.encode = function () {
 	var o = {};
 	
-	for (props in this) {
+	for (prop in this) {
 		if (this.hasOwnProperty(prop)) {
-			o[prop] = this[prop];
+			if (prop == 'pos') {
+				o[prop] = {'x' : this[prop].x, 'y' : this[prop].y};
+			} else {
+				o[prop] = this[prop];
+			}
 		}
 	}
 	
