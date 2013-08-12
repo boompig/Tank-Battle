@@ -79,7 +79,7 @@ Tank.TURRET_REL = new Vector(Tank.WIDTH / 2, Tank.HEIGHT / 2);
  * How frequently the tank can shoot, in MS
  * @returns {Number}
  */
-Tank.MAX_HP = 10;
+Tank.MAX_HP = 1;
 
 /**
  * Governs how often a shot can be fired.

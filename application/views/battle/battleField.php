@@ -29,8 +29,14 @@ header('Expires: 0'); // Proxies.
         <script src="<?=base_url() ?>js/battle/battlefield.js"></script>
 
         <script>
+        	function endBattle () {
+        		window.location.href = "<?=base_url() ?>combat/leaveBattle";
+        	}
+        
 			$(function() {
 				"use strict";
+				
+				$("button").button();
 				
 				Arena.serverURL = "<?=base_url() ?>";
 				Arena.serverPushPull();
@@ -51,7 +57,9 @@ header('Expires: 0'); // Proxies.
 	        <!-- <button type="button" onlick="Arena.stop">Stop</button> -->
 	        
 	        <div id="results" style="display: none;">
-	        	<span>The winner is&nbsp;<span id="winner">Player 5</span></span>
+	        	<span class="banner">Game Over.&nbsp;</span>
+	        	<span class="msg"><!-- results go here --></span>
+	        	<button type="button" onclick="endBattle">Return to Lobby</button>
 	        </div>
      </div> <!-- end content -->
     </body>

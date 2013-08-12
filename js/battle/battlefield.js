@@ -58,6 +58,22 @@ Arena.serverPushPull = function () {
 			Arena.updateGameServer();
 			break;
 		case Arena.STATES.done:
+			Arena.updateGameServer(true); // do one more force-update
+			
+			// then check status
+			
+			var msg;
+			
+			if (Arena.game.getStatus() === 'draw') {
+				msg = "The result is a draw!";
+			} else if (Arena.game.getStatus() === 'loss') {
+				msg = "You lost. Q_Q";
+			} else if (Arena.game.getStatus() === 'win') {
+				msg = "You won! Yay! \ o /";
+			}
+			
+			$("#results").show().find(".msg").html(msg);
+			
 			break;
 	}
 };
@@ -99,10 +115,16 @@ Arena.redraw = function () {
 		Arena.game.shoot(0);
 	}
 	
-	Arena.game.redraw();
+	var ok = Arena.game.redraw();
+	
+	if (! ok) {
+		Arena.state = Arena.STATES.done;
+	}
 	
 	if (! Arena.game.isGameOver() && Arena.state === Arena.STATES.playing) {
 		setTimeout(Arena.redraw, Arena.REFRESH_INTERVAL);
+	} else {
+		Arena.serverPushPull();
 	}
 };
 
@@ -158,12 +180,14 @@ Arena.stop = function () {
 	Arena.state = Arena.STATES.done;
 };
 
-Arena.pushGameServer = function () {
+Arena.pushGameServer = function (force) {
 	"use strict";
 	
-	if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
-		// stop
-		return;
+	if (! force) {
+		if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
+			// stop
+			return;
+		}
 	}
 	
 	// do not push until we get initial data
@@ -187,12 +211,14 @@ Arena.pushGameServer = function () {
 	});
 };
 
-Arena.pullGameServer = function () {
+Arena.pullGameServer = function (force) {
 	"use strict"
 	
-	if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
-		// stop
-		return;
+	if (! force) {
+		if (Arena.state === Arena.STATES.done || Arena.game.isGameOver()) {
+			// stop
+			return;
+		}
 	}
 	
 	if (Arena.pulling) {
@@ -217,15 +243,13 @@ Arena.pullGameServer = function () {
 				Arena.attachEvents();
 				Arena.redraw();
 			} else {
-				// console.log("other shot: (" + data.shot_x + ", " + data.shot_y + ")");
-				// console.log(data.shot_x);
-				// console.log(data.shot_y);
-				// console.log("other shot : " + data.hasShot);
-				// console.log("x : " + data.shot_x);
-				// console.log("y : " + data.shot_y);
-				
 				// add shots
 				Arena.game.addOtherTankShot(Number(data.shot_x), Number(data.shot_y), Boolean(data.hasShot));
+				
+				if (data.isDead) {
+					Arena.game.tanks[1].hp = 0;
+					Arena.state = Arena.STATES.done;
+				}
 			}
 			
 			if (data.status !== 'active') {
@@ -246,10 +270,10 @@ Arena.pullGameServer = function () {
  * Update game with status of server.
  * Push (own info) before pull (other info)
  */
-Arena.updateGameServer = function () {
+Arena.updateGameServer = function (force) {
 	// these are indep. and work on own timers
-	Arena.pushGameServer();
-	Arena.pullGameServer();
+	Arena.pushGameServer(force);
+	Arena.pullGameServer(force);
 };
 
 /**

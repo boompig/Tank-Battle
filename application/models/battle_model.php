@@ -92,6 +92,35 @@ class Battle_model extends CI_Model {
 		return $this -> db -> update('battle', array('u2_msg' => $msg));
 	}
 
+	/**
+	 * Last parameter to self-report dead tank
+	 */
+	function updateStatusHelper ($userID, $battleID, $isDead) {
+		if (! $isDead) {
+			// no need to update status
+			return;
+		}
+		
+		$battleObj = $this -> get($battleID);
+		
+		if ($userID === $battleObj -> user1_id) {
+			if ($battleObj -> u2_hit) {
+				return $this -> updateStatus ($battleID, Battle::DRAW);
+			} else {
+				return $this -> updateStatus ($battleID, Battle::U2WON);
+			}
+		} else {
+			if ($battleObj -> u1_hit) {
+				return $this -> updateStatus ($battleID, Battle::DRAW);
+			} else {
+				return $this -> updateStatus ($battleID, Battle::U1WON);
+			}
+		}
+	}
+
+	/**
+	 * Should be called by the helper function only.
+	 */
 	function updateStatus($id, $status) {
 		$this -> db -> where('id', $id);
 		return $this -> db -> update('battle', array('battle_status_id' => $status));

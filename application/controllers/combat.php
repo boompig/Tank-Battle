@@ -56,6 +56,28 @@ class Combat extends CI_Controller {
 	}
 
 	/**
+	 * Called at the end of the battle.
+	 * Set battle_status to available
+	 * 
+	 * Reset invite id to null
+	 */
+	function leaveBattle () {
+		$this -> load -> model ("user_model");
+		$user = $_SESSION['user'];
+		
+		// the user is no longer 
+		$this -> db -> trans_start();
+		$this -> user_model -> updateInvitation($user -> id, null);
+		$this -> user_model -> updateBattle($user -> id, null);
+		$this -> user_model -> updateStatus($user -> id, User::AVAILABLE);
+		// reload user object
+		$_SESSION['user'] = $this -> user_model -> get($user -> login);
+		$this -> db -> trans_commit();
+		
+		redirect("arcade/index", "refresh");
+	}
+
+	/**
 	 * Called by battleField.php to post the results of the battle.
 	 */
 	function postBattleStatus () {
@@ -109,6 +131,7 @@ class Combat extends CI_Controller {
 		$this -> form_validation -> set_rules("x", "Tank x-coordinate", 'required|integer');
 		$this -> form_validation -> set_rules("y", "Tank y-coordinate", 'required|integer');
 		$this -> form_validation -> set_rules("hasShot", "Whether tank has shot", 'required|is_natural|less_than[2]');
+		$this -> form_validation -> set_rules("isDead", "Whether tank has shot", 'required|is_natural|less_than[2]');
 		$this -> form_validation -> set_rules("angle", "Tank y-coordinate", 'required|integer');
 		
 		if ($this -> form_validation -> run()) {
@@ -127,6 +150,7 @@ class Combat extends CI_Controller {
 			$x1 = $this -> input -> post('x');
 			$y1 = $this -> input -> post('y');
 			$hasShot = $this -> input -> post ('hasShot');
+			$isDead = $this -> input -> post ('isDead');
 			$angle = $this -> input -> post('angle');
 			
 			if ($hasShot) {
@@ -136,7 +160,11 @@ class Combat extends CI_Controller {
 			}
 						
 			// TODO still setting hit to false
-			$result = $this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, $x2, $y2, $angle, $hasShot, false);
+			$result = $this -> battle_model -> updateUser($user -> id, $user -> battle_id, $x1, $y1, $x2, $y2, $angle, $hasShot, $isDead);
+
+			if ($isDead) {
+				$this -> battle_model -> updateStatusHelper ($user -> id, $user -> battle_id, $isDead);
+			}
 
 			$data['result'] = $result;
 			echo json_encode($data);
@@ -181,6 +209,7 @@ class Combat extends CI_Controller {
 			$data['shot_x'] = $battle -> u2_x2;
 			$data['shot_y'] = $battle -> u2_y2;
 			$data['hasShot'] = $battle -> u2_shot;
+			$data['isDead'] = $battle -> u2_hit;
 			
 			// your player data
 			$data['your_x'] = $battle -> u1_x1;
@@ -196,6 +225,7 @@ class Combat extends CI_Controller {
 			$data['shot_x'] = $battle -> u1_x2;
 			$data['shot_y'] = $battle -> u1_y2;
 			$data['hasShot'] = $battle -> u1_shot;
+			$data['isDead'] = $battle -> u1_hit;
 			
 			// your player data
 			$data['your_x'] = $battle -> u2_x1;

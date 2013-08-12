@@ -324,7 +324,8 @@ Game.prototype.encode = function () {
 		"hasShot" : Number(this.tanks[0].hasShot), // encode to 0 or 1
 		"shot_x" : null,
 		"shot_y" : null,
-		"shotObjs" : []
+		"shotObjs" : [],
+		"isDead" : Number(this.tanks[0].isDead()) // encode to 0 or 1
 	};
 	
 	for (var i = 0; i < this.shots.length; i++) {
