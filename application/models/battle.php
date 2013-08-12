@@ -33,4 +33,16 @@ class Battle {
 
 	public $battle_status_id = self::ACTIVE;
 
+	function getTextBattleStatus () {
+		switch ($this -> battle_status_id) {
+			case (Battle::ACTIVE):
+				return "active";
+			case (Battle::U1WON):
+				return "u1won";
+			case (Battle::U2WON):
+				return "u2won";
+			case (Battle::DRAW):
+				return "draw";
+		}
+	}
 }

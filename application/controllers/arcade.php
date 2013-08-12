@@ -27,6 +27,10 @@ class Arcade extends CI_Controller {
 		$this -> load -> view('arcade/mainPage', $data);
 	}
 
+	/**
+	 * A poll method to check for newly available users.
+	 * Loads the availableUsers view with the data.
+	 */
 	function getAvailableUsers() {
 		$this -> load -> model('user_model');
 		$users = $this -> user_model -> getAvailableUsers();
@@ -35,6 +39,10 @@ class Arcade extends CI_Controller {
 		$this -> load -> view('arcade/availableUsers', $data);
 	}
 
+	/**
+	 * A poll method to check for new invitations.
+	 * Returns some JSON
+	 */
 	function getInvitation() {
 		$user = $_SESSION['user'];
 
@@ -55,14 +63,19 @@ class Arcade extends CI_Controller {
 		}
 	}
 
+	/**
+	 * Called from view arcade/mainPage
+	 * Used to accept an invitation.
+	 */
 	function acceptInvitation() {
 		$user = $_SESSION['user'];
+		$data = array();
 
 		$this -> load -> model('user_model');
 		$this -> load -> model('invite_model');
 		$this -> load -> model('battle_model');
 
-		$user = $this -> user_model -> get($user -> login);
+		$user = $this -> user_model -> getExclusive($user -> login);
 
 		$invite = $this -> invite_model -> get($user -> invite_id);
 		$hostUser = $this -> user_model -> getFromId($invite -> user1_id);
@@ -72,12 +85,37 @@ class Arcade extends CI_Controller {
 
 		// change status of invitation to ACCEPTED
 		$this -> invite_model -> updateStatus($invite -> id, Invite::ACCEPTED);
+		
+		if ($this -> db -> trans_status() === FALSE)
+			goto transactionerror;
+		
+		$data["invite accepted insert good"] = true;
 
 		// create a battle entry
 		$battle = new Battle();
 		$battle -> user1_id = $user -> id;
 		$battle -> user2_id = $hostUser -> id;
+		
+		// create default spawn points and turret angles here
+		// user 1 starts at (60, 60) with turret @ 90 degrees
+		$battle -> u1_x1 = 60;
+		$battle -> u1_y1 = 60;
+		$battle -> u1_angle = 0;
+		
+		// user 2 starts at (540, 340) with turret @ 270 degrees
+		$battle -> u2_x1 = 540;
+		$battle -> u2_y1 = 340;
+		$battle -> u2_angle = 180;
+		
+		$data["battle"] = $battle;
 		$this -> battle_model -> insert($battle);
+		
+		if ($this -> db -> trans_status() === FALSE) {
+			// $data["msg"] = htmlentities($this -> db -> error_message());
+			goto transactionerror;
+		}
+		
+		$data["battleInsert"] = true;
 		$battleId = mysql_insert_id();
 
 		// update status of both users
@@ -99,12 +137,16 @@ class Arcade extends CI_Controller {
 
 		// something went wrong
 		transactionerror:
-		$this -> db -> trans_rollback();
-
-		echo json_encode(array('status' => 'failure'));
-
+			$this -> db -> trans_rollback();
+			$data['status'] = 'failure';
+			$data["textStatus"] = "transaction status is failing";
+			echo json_encode($data);
 	}
 
+	/**
+	 * Called from view arcade/mainPage
+	 * Used to decline an invitation.
+	 */
 	function declineInvitation() {
 		$user = $_SESSION['user'];
 
@@ -140,6 +182,9 @@ class Arcade extends CI_Controller {
 		echo json_encode(array('status' => 'failure'));
 	}
 
+	/**
+	 * Called by battleField view to see if invitation was accepted, rejected, or is pending.
+	 */
 	function checkInvitation() {
 		$user = $_SESSION['user'];
 
@@ -150,24 +195,29 @@ class Arcade extends CI_Controller {
 
 		$invite = $this -> invite_model -> get($user -> invite_id);
 
-		switch($invite->invite_status_id) {
-			case Invite::ACCEPTED :
+		switch($invite -> invite_status_id) {
+			case Invite::ACCEPTED:
 				echo json_encode(array('status' => 'accepted'));
 				break;
-			case Invite::PENDING :
+			case Invite::PENDING:
 				echo json_encode(array('status' => 'pending'));
 				break;
-			case Invite::REJECTED :
+			case Invite::REJECTED:
 				$this -> user_model -> updateStatus($user -> id, User::AVAILABLE);
 				echo json_encode(array('status' => 'rejected'));
+				break;
 		}
 	}
 
+	/**
+	 * Called by view arcade/mainPage
+	 * Used to invite another user to a battle.
+	 */
 	function invite() {
 		try {
 			$login = $this -> input -> get('login');
 
-			if (!isset($login))
+			if (! isset($login))
 				goto loginerror;
 
 			$user1 = $_SESSION['user'];
@@ -221,18 +271,15 @@ class Arcade extends CI_Controller {
 			// something went wrong
 			transactionerror:
 			nouser2:
-			$this -> db -> trans_rollback();
+				$this -> db -> trans_rollback();
 
 			loginerror:
-
-			$_SESSION["errmsg"] = "Sorry, this user is no longer available.";
+				$_SESSION["errmsg"] = "Sorry, this user is no longer available.";
 
 			redirect('arcade/index', 'refresh');
 			//redirect to the main application page
 		} catch(Exception $e) {
 			$this -> db -> trans_rollback();
 		}
-
 	}
-
 }

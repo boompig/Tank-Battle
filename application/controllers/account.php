@@ -97,6 +97,11 @@ class Account extends CI_Controller {
 		$user = $_SESSION['user'];
 		$this -> load -> model('user_model');
 		$this -> user_model -> updateStatus($user -> id, User::OFFLINE);
+		
+		// delete all battles and invites as well
+		$this -> user_model -> updateInvitation($user -> id, null);
+		$this -> user_model -> updateBattle($user -> id, null);
+		
 		session_destroy();
 		redirect('account/index', 'refresh');
 		//Then we redirect to the index page again

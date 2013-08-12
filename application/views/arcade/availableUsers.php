@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="<?=base_url() ?>css/arcade.css" />
+
 <table>
 	<?php 
 		// want > 1 to exclude self

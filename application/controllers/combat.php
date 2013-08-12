@@ -64,6 +64,37 @@ class Combat extends CI_Controller {
 		
 		
 	}
+	
+	/**
+	 * Return the status of a battle.
+	 */
+	function checkBattleStatus () {
+		$user = $_SESSION['user'];
+
+		$this -> load -> model('user_model');
+		$this -> load -> model('battle_model');
+
+		$user = $this -> user_model -> get($user -> login);
+
+		$battle = $this -> battle_model -> get($user -> battle_id);
+
+		switch($battle -> battle_status_id) {
+			case Battle::ACTIVE:
+				echo json_encode(array('status' => 'accepted'));
+				break;
+			case Battle::U1WON:
+				// TODO indicate to the user whether they won or not
+				echo json_encode(array('status' => 'u1won'));
+				break;
+			case Battle::U2WON:
+				// TODO indicate to the user whether they won or not
+				echo json_encode(array('status' => 'u2won'));
+				break;
+			case Battle::DRAW:
+				echo json_encode(array('status' => 'draw'));
+				break;
+		}
+	}
 
 	/**
 	 * Called by battleField.php to post the tank positions, turret angle, and other mid-game info.
@@ -114,6 +145,7 @@ class Combat extends CI_Controller {
 	 * Return information about the game from the server.
 	 */
 	function getBattle () {
+		
 		$this -> load -> model('user_model');
 		$this -> load -> model('battle_model');
 
@@ -128,16 +160,32 @@ class Combat extends CI_Controller {
 		$this -> db -> trans_begin();
 
 		$battle = $this -> battle_model -> getExclusive($user -> battle_id);
-		$data = array("status" => "success");
+		$data = array("status" => $battle -> getTextBattleStatus());
 
 		if ($battle -> user1_id == $user -> id) {
+			// this user is user 1
+			
+			// other player data
 			$data['x'] = $battle -> u2_x1;
-			$data['y'] = $battle -> u2_x1;
+			$data['y'] = $battle -> u2_y1;
 			$data['angle'] = $battle -> u2_angle;
+			
+			// your player data
+			$data['your_x'] = $battle -> u1_x1;
+			$data['your_y'] = $battle -> u1_y1;
+			$data['your_angle'] = $battle -> u1_angle;
 		} else {
+			// this user is user 2
+			
+			// other player data
 			$data['x'] = $battle -> u1_x1;
-			$data['y'] = $battle -> u1_x1;
+			$data['y'] = $battle -> u1_y1;
 			$data['angle'] = $battle -> u1_angle;
+			
+			// your player data
+			$data['your_x'] = $battle -> u2_x1;
+			$data['your_y'] = $battle -> u2_y1;
+			$data['your_angle'] = $battle -> u2_angle;
 		}
 
 		if ($this -> db -> trans_status() === FALSE) {

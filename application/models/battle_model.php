@@ -33,6 +33,9 @@ class Battle_model extends CI_Model {
 			return null;
 	}
 
+	/**
+	 * Create a new battle by inserting some preliminary records.
+	 */
 	function insert($battle) {
 		return $this -> db -> insert('battle', $battle);
 	}

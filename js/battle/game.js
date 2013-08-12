@@ -22,13 +22,16 @@ function Game (canvasSelector) {
 	this.width = $(this.canvas).attr("width");
 	this.height = $(this.canvas).attr("height");
 	
-	
+	/**
+	 * Permanently set at 2
+	 */
 	this.numPlayers = 2;
+	
 	// create tanks
 	this.tanks = Array(this.numPlayers);
 	
 	for (var i = 0; i < this.numPlayers; i++) {
-		this.tanks[i] = new Tank(this.getPlayerSpawn(i), this.getPlayerFacing(i), i);
+		this.tanks[i] = new Tank(null, null, i);
 	}
 	
 	/**
@@ -125,6 +128,10 @@ Game.prototype.getPlayerFacing = function (playerIndex) {
 		// if > 2 players, face random directions
 		// i dunno
 	}
+};
+
+Game.prototype.hasInitPos = function () {
+	return ! isNaN(this.tanks[0].x);
 };
 
 /*******************************************************************************/
@@ -286,23 +293,73 @@ Game.prototype.encode = function () {
 	return json;
 };
 
+Game.prototype.updateOwnTank = function (x, y, angle) {
+	if (! this.tanks[0].pos)
+		this.tanks[0].pos = new Vector(0, 0);
+	
+	this.tanks[0].pos.x = Number(x);
+	this.tanks[0].pos.y = Number(y);
+	this.tanks[0].turretAngle = Utils.DegToRad (Number(angle));
+};
+
+Game.prototype.updateOtherTank = function (x, y, angle) {
+	if (! this.tanks[1].pos)
+		this.tanks[1].pos = new Vector(0, 0);
+	
+	this.tanks[1].pos.x = Number(x);
+	this.tanks[1].pos.y = Number(y);
+	this.tanks[1].turretAngle = Utils.DegToRad (Number(angle));
+};
+
 /**
  * Pull game info from the server.
+ * f is usually undefined, but can be a callback function to call on success
  */
-Game.prototype.pullServer = function (serverURL) {
+Game.prototype.pullServer = function (serverURL, first, f) {
 	"use strict";
 	
 	var url = serverURL + "combat/getBattle";
 	var that = this;
 	
+	if (this.tanks[0].x === null) {
+		first = true;
+	}
+	
 	$.getJSON (url, function (data, textStatus, jqXHR) {
 		"use strict";
 		
 		if (data && data.status === 'success') {
+			console.log(data);
+			
 			that.tanks[1].pos.x = Number(data.x);
 			that.tanks[1].pos.y = Number(data.y);
 			that.tanks[1].turretAngle = Utils.DegToRad (Number(data.angle));
+			
+			if (first) {
+				that.tanks[0].pos.x = Number(data.your_x);
+				that.tanks[0].pos.y = Number(data.your_y);
+				that.tanks[0].turretAngle = Utils.DegToRad (Number(data.your_angle));
+			}
+			
+			if (f) {
+				f ();
+			}
 		}
+	}).fail(function (data, textStatus) {
+		// console.log(url);
+		// someone else has the lock?
+		function f2 () {
+			console.log(serverURL);
+			console.log(first);
+			console.log(f);
+			that.pullServer(serverURL, first, f);
+		}
+		
+		// setTimeout(f2, 1000);
+		
+		// console.log("failed?");
+		// console.log(data);
+		// console.log(textStatus);
 	});
 };
 

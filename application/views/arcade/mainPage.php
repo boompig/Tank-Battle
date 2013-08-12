@@ -26,27 +26,64 @@ header('Expires: 0'); // Proxies.
 		
 		<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
 		<script>
-			$(function(){
+			$(function() {
+				"use strict";
 				
-				$('#availableUsers').everyTime(500, function(){
-						$('#availableUsers').load('<?= base_url() ?>arcade/getAvailableUsers');
-	
-						$.getJSON('<?= base_url() ?>arcade/getInvitation',function(data, text, jqZHR){
-								if (data && data.invited) {
-									var user=data.login;
-									var time=data.time;
-									if(confirm('Battle ' + user)) 
-										$.getJSON('<?= base_url() ?>arcade/acceptInvitation',function(data, text, jqZHR){
-											if (data && data.status == 'success')
-												window.location.href = '<?= base_url() ?>combat/index'
-										});
-									else  
-										$.post("<?= base_url() ?>arcade/declineInvitation");
-								}
-							});
-					});
+				var serverURL = '<?= base_url() ?>';
+				
+				$('#availableUsers').everyTime(500, function() {
+					$('#availableUsers').load(serverURL + 'arcade/getAvailableUsers');
 				});
-		
+
+				setTimeout(pollForInvites, 500);
+				
+				/**
+				 * Poll the server for invites
+				 */
+				function pollForInvites () {
+					"use strict";
+					
+					$.getJSON(serverURL + "arcade/getInvitation", function(data, text, jqZHR) {
+						"use strict";
+						
+						if (data && data.invited) {
+							var user = data.login;
+							var time = data.time;
+							
+							if (confirm (user + " has challenged you to a tank battle. Accept?")) {
+								var url = '<?= base_url() ?>arcade/acceptInvitation';
+								console.log(url);
+								
+								$.getJSON(url, {}).done(function(data, text, jqZHR) {
+									"use strict";
+									
+									console.log(data);
+									
+									if (data && data.status == 'success') {
+										window.location.href = '<?= base_url() ?>combat/index';
+									} else {
+										alert ("Failed to join game");
+										setTimeout(pollForInvites, 500);
+									}
+								}).fail(function(jqXHR, textStatus, error) {
+									console.log("failure");
+									console.log(error);
+									console.log(textStatus);
+								});
+							} else {
+								$.post(serverURL + "arcade/declineInvitation", function () {
+									// once you decline the invitation, you can once again check for invites
+									setTimeout(pollForInvites, 500);
+								});
+							}
+						} else {
+							// console.log("no invite");
+							// poll for invites again if no invites or no data from server
+							setTimeout(pollForInvites, 500);
+						}
+					});
+				}
+			});
 		</script>
 	</head> 
 	<body>  
@@ -59,7 +96,8 @@ header('Expires: 0'); // Proxies.
 			<div id="logoPane">
 				<div class="logoMsg">
 					<h3>Lobby</h3>
-					<span>Hello, <?=$user->fullName() ?>. Are you ready for a Tank Battle?</span>
+					<span>Hello, <?=$user->fullName() ?>. Are you ready for a Tank Battle?
+						Click on a user to challenge them to a battle.</span>
 				</div>
 				
 				<img class="big-logo" src="<?=base_url() ?>images/tank.svg" />

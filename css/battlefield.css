@@ -1,11 +1,7 @@
-header {
-	margin: 0 auto;
-	text-align: center;
-}
-
 #content {
-	margin: 0 auto;
+	margin: 20px auto 0 auto;
 	text-align: center;
+	width: 900px;
 }
 
 #arena {
@@ -22,4 +18,9 @@ header {
 	color: #1BE056;
 	font-weight: bold;
 	text-align: center;
+}
+
+#noPlayer2 {
+	text-align: center;
+	margin: 0 auto;
 }
