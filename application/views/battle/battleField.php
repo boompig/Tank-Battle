@@ -61,13 +61,25 @@ header('Expires: 0'); // Proxies.
 	    		Please wait while the other player connects<span id="dots"></span>
 	    	</div>
 	    	
-	    	<canvas id="arena" height="400" width="600" style="display: none;"></canvas>
-	        <!-- <button type="button" onlick="Arena.stop">Stop</button> -->
-	        
-	        <div id="results" style="display: none;">
-	        	<span class="banner">Game Over.&nbsp;</span>
-	        	<span class="msg"><!-- results go here --></span>
-	        	<button type="button" id="backButton">Return to Lobby</button>
+	    	<div id="gamePanel" style="display: none;">
+		    	<div id="instructions">
+		    		<h3>Instructions</h3>
+		    		You control the blue tank while your opponent controls the green tank.
+		    		<h4>Controls</h4>
+		    		<span id="controls">Use WASD or the arrow keys to move the tank. Aim your turret with the mouse. Click or press space bar to fire.</span>
+		    		
+		    		<h4>Objective</h4>
+		    		<span id="objective">Shoot the other tank before it shoots you. Avoid bullets.</span>
+		    	</div>
+		    	
+		    	<canvas id="arena" height="400" width="600"></canvas>
+		        <!-- <button type="button" onlick="Arena.stop">Stop</button> -->
+		        
+		        <div id="results" style="display: none;">
+		        	<span class="banner">Game Over.&nbsp;</span>
+		        	<span class="msg"><!-- results go here --></span>
+		        	<button type="button" id="backButton">Return to Lobby</button>
+		        </div>
 	        </div>
      </div> <!-- end content -->
     </body>

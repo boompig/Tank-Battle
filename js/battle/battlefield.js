@@ -235,18 +235,16 @@ Arena.pullGameServer = function (force) {
 			Arena.game.updateOtherTank (data.x, data.y, data.angle);
 			
 			if (first) {
-				// console.log("first pull:");
-				// console.log(data);
-				
 				Arena.game.updateOwnTank (data.your_x, data.your_y, data.your_angle);
-				$("#arena").show();
+				$("#gamePanel").show();
 				Arena.attachEvents();
 				Arena.redraw();
 			} else {
 				// add shots
-				Arena.game.addOtherTankShot(Number(data.shot_x), Number(data.shot_y), Boolean(data.hasShot));
+				if (data.shot_x && data.shot_y)
+					Arena.game.addOtherTankShot(Number(data.shot_x), Number(data.shot_y), Boolean(Number(data.hasShot)));
 				
-				if (data.isDead) {
+				if (data.isDead && Boolean(Number(data.isDead))) {
 					Arena.game.tanks[1].hp = 0;
 					Arena.state = Arena.STATES.done;
 				}

@@ -1,7 +1,7 @@
 #content {
 	margin: 20px auto 0 auto;
 	text-align: center;
-	width: 900px;
+	width: 950px;
 }
 
 #arena {
@@ -22,6 +22,23 @@
 
 #results button {
 	margin-top: 10px;
+}
+
+#instructions, #arena {
+	display: inline-block;
+	text-align: left;
+	margin-top: 0;
+	padding-top: 0;
+}
+
+#instructions {
+	width: 300px;
+	position: relative;
+	bottom: 40px;
+}
+
+#instructions h3, #instructions h4 {
+	color: #1BA5E0;
 }
 
 #noPlayer2 {

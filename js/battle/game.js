@@ -81,7 +81,8 @@ Game.prototype.addOtherTankShot = function (shot_x, shot_y, hasShot) {
 	
 	for (var i = 0; i < this.shots.length; i++) {
 		if (this.shots[i].src === 1) {
-			this.shots.splice(i, 1, shot);
+			var oldShot = this.shots.splice(i, 1, shot);
+			shot.angle = oldShot.angle; // if the shot is replacing an old shot, then keep the old angle
 			added = true;
 		}
 	}
@@ -209,9 +210,9 @@ Game.prototype.redraw = function () {
 	}
 	
 	// draw hit points for the tank (done after for layering purposes)
-	for (var i = 0; i < this.numPlayers; i++) {
-		this.tanks[i].drawHP(this.context);
-	}
+	// for (var i = 0; i < this.numPlayers; i++) {
+		// this.tanks[i].drawHP(this.context);
+	// }
 	
 	var normalShot;
 	
